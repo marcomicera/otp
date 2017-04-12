@@ -16,8 +16,7 @@ public class OTPserver extends Application {
                 Thread.sleep(3000); // elaborazione
             }
         } catch(Exception e) { e.printStackTrace(); }
-        
-        // marco
+
         Group root = new Group();
         Scene scene = new Scene(root, 500, 500);
 
