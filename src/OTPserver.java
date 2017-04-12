@@ -8,12 +8,13 @@ import javafx.stage.Stage;
 
 public class OTPserver extends Application {
     public void start(Stage stage) {
-        try(ServerSocket servs = new ServerSocket(8080, 7)) { // Socket di accettazione, bidirezionale
+        // Server bidirectional socket
+        try(ServerSocket servs = new ServerSocket(8080, 7)) {
             while(true) { 
-                try( Socket s = servs.accept(); // Socket normale 
+                try( Socket s = servs.accept(); // Socket to client
                      ObjectInputStream oin = new ObjectInputStream(s.getInputStream());
                    ) { System.out.println("Ricevuto: " + oin.readObject()); }
-                Thread.sleep(3000); // elaborazione
+                Thread.sleep(3000); // processing
             }
         } catch(Exception e) { e.printStackTrace(); }
 
