@@ -25,7 +25,7 @@ public class OTPclient extends Application {
         SecretKey key = KeyGenerator.getInstance("DES").generateKey();
         encrCipher.init(Cipher.ENCRYPT_MODE, key);*/
 
-        // marco 5
+        // marco 6
         Group root = new Group();
         Scene scene = new Scene(root, 500, 500);
         
