@@ -32,7 +32,7 @@ public class OTPclient extends Application {
         SecretKey key = KeyGenerator.getInstance("DES").generateKey();
         encrCipher.init(Cipher.ENCRYPT_MODE, key);*/
         
-        VBox wrapper = new VBox(5);
+        VBox wrapper = new VBox(40);
         VBox loginInterface = new VBox(5);
         VBox otpInterface = new VBox(5);
         
@@ -44,7 +44,7 @@ public class OTPclient extends Application {
         Button signInButton = new Button("Sign In");
         
         // OTP interface
-        Image otpImage = new Image("otpUI.png");
+        Image otpImage = new Image("file:img/otpUI.png", 200, 200, true, true);
         ImageView otpImageDisplayer = new ImageView();
         otpImageDisplayer.setImage(otpImage);
         
