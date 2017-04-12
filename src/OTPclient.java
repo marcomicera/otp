@@ -44,7 +44,7 @@ public class OTPclient extends Application {
         Button signInButton = new Button("Sign In");
         
         // OTP interface
-        Image otpImage = new Image("file:img/otpUI.png", 200, 200, true, true);
+        Image otpImage = new Image("file:img/otpUI.png", 250, 250, true, true);
         ImageView otpImageDisplayer = new ImageView();
         otpImageDisplayer.setImage(otpImage);
         
