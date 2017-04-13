@@ -66,7 +66,7 @@ public class LoginUI {
     }
     
     private void sslSend(String message) {
-        System.setProperty("javax.net.ssl.trustStore", "mySrvKeystore");
+        System.setProperty("javax.net.ssl.trustStore", "../../mySrvKeystore");
         SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
         try(Socket s = ssf.createSocket("localhost", 8080);
