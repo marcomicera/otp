@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,30 +16,24 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.net.*;
+import javax.net.ssl.*;
 
 public class OTPserver extends Application {
+    
+private static final int PORT = 8080;
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         // Server bidirectional socket
-        try(ServerSocket servs = new ServerSocket(8080, 7)) {
-            while(true) { 
-                Socket s = servs.accept(); // Socket to client
-                Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        try(ObjectInputStream oin = new ObjectInputStream(s.getInputStream())) { 
-                            System.out.println("Ricevuto: " + oin.readObject());
-                            Thread.sleep(3000); // processing
-                        } catch(Exception e) {
-                            Logger.getLogger(OTPserver.class.getName()).log(Level.SEVERE, null, e);
-                        }
-                    }
-                };
-            }
-        } catch(IOException ioe) { 
-            Logger.getLogger(OTPserver.class.getName()).log(Level.SEVERE, null, ioe);
+        SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+        ServerSocket ss = ssf.createServerSocket(PORT);
+        Socket s = ss.accept();
+        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        String line = null;
+        while (((line = in.readLine()) != null)) {
+        System.out.println(line);
         }
-
+        /*
         // Connecting to database
         try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
             Statement st = co.createStatement();
@@ -54,6 +50,6 @@ public class OTPserver extends Application {
 
         stage.setTitle("One Time Password server interface");
         stage.setScene(scene);
-        stage.show();
+        stage.show();*/
     }
 }
