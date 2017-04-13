@@ -37,17 +37,6 @@ public class OTPserver extends Application {
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
-        
-        // Connecting to database
-        /*try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
-            Statement st = co.createStatement();
-        ) {
-            ResultSet rs = st.executeQuery("select * from prova");
-            while(rs.next())
-                System.out.println(rs.getInt("<integer_column_name>") + rs.getString("<string_column_name>"));
-        } catch(SQLException e) {
-            System.err.println(e.getMessage());
-        }*/
     }
 }
 
@@ -60,3 +49,14 @@ System.out.println("Protocol is " + session.getProtocol());
 System.out.println("ID is " + new BigInteger(session.getId()));
 System.out.println("Session created in " + session.getCreationTime());
 System.out.println("Session accessed in " + session.getLastAccessedTime());*/
+
+// Code snippet for connecting to a database
+/*try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
+    Statement st = co.createStatement();
+) {
+    ResultSet rs = st.executeQuery("select * from prova");
+    while(rs.next())
+        System.out.println(rs.getInt("<integer_column_name>") + rs.getString("<string_column_name>"));
+} catch(SQLException e) {
+    System.err.println(e.getMessage());
+}*/
