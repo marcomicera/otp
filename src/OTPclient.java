@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -15,6 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import java.net.*;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import javax.net.ssl.*;
 
 // Package di sicurezza
@@ -23,14 +28,32 @@ import javax.crypto.*;
 
 public class OTPclient extends Application {
     public void start(Stage stage) {
-        // Sending an example string
-        SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-        try(Socket s = sf.createSocket("localhost", 8080); // Normal bidirectional socket
-            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
-        ) { oout.writeObject("ciao, server!");
-        } catch(IOException e) { e.printStackTrace(); }
-        System.out.println("Message sent.");
+        System.setProperty("javax.net.ssl.trustStore", "mySrvKeystore");
+        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         
+        try(Socket s = ssf.createSocket("localhost", 8080);
+             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
+        ) { 
+            SSLSession session = ((SSLSocket)s).getSession();
+            Certificate[] cchain = session.getPeerCertificates();
+            
+            // Prints
+            System.out.println("The Certificates used by peer");
+            for (int i = 0; i < cchain.length; i++)
+                System.out.println(((X509Certificate) cchain[i]).getSubjectDN());
+            System.out.println("Peer host is " + session.getPeerHost());
+            System.out.println("Cipher is " + session.getCipherSuite());
+            System.out.println("Protocol is " + session.getProtocol());
+            System.out.println("ID is " + new BigInteger(session.getId()));
+            System.out.println("Session created in " + session.getCreationTime());
+            System.out.println("Session accessed in " + session.getLastAccessedTime());
+            
+            oout.writeObject("Hello, server!");
+        } catch(IOException e) {
+            e.printStackTrace(); 
+        }
+        System.out.println("Message sent.");
+    
         // Ciphers code blocks
         /*private Cipher encrCipher;
         encrCipher.getInstance("DES");
