@@ -23,16 +23,14 @@ public class OTPserver extends Application {
     
 private static final int PORT = 8080;
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws Exception {
         // Server bidirectional socket
         SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         ServerSocket ss = ssf.createServerSocket(PORT);
         Socket s = ss.accept();
-        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        String line = null;
-        while (((line = in.readLine()) != null)) {
-        System.out.println(line);
-        }
+        ObjectInputStream oin = new ObjectInputStream(s.getInputStream());
+        System.out.println("Server received: " + oin.readObject());
+        
         /*
         // Connecting to database
         try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
