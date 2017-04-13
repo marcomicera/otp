@@ -14,6 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import java.net.*;
+import javax.net.ssl.*;
 
 // Package di sicurezza
 // https://docs.oracle.com/javase/7/docs/api/javax/crypto/package-summary.html
@@ -22,11 +24,11 @@ import javax.crypto.*;
 public class OTPclient extends Application {
     public void start(Stage stage) {
         // Sending an example string
-        /*try(Socket s = new Socket("localhost", 8080); // Normal bidirectional socket
+        try(Socket s = new Socket("localhost", 8080); // Normal bidirectional socket
             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
         ) { oout.writeObject("ciao, server!");
         } catch(IOException e) { e.printStackTrace(); }
-        System.out.println("Message sent.");*/
+        System.out.println("Message sent.");
         
         //  Spezzoni
         /*private Cipher encrCipher;
