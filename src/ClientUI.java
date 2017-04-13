@@ -8,46 +8,21 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 public class ClientUI {
-    public static VBox showUI() {
-        VBox wrapper = new VBox(40);
-        VBox loginInterface = new VBox(5);
-        VBox otpInterface = new VBox(5);
+    private final static int    WRAPPER_SPACING = 40;
+    
+    private final VBox wrapper;
+    private final LoginUI loginUI;
+    private final OTPUI otpUI;
+    
+    public ClientUI() {
+        wrapper = new VBox(WRAPPER_SPACING);
+        loginUI = new LoginUI();
+        otpUI = new OTPUI();
         
-        // Login interface
-        Label loginTitle = new Label("Home banking login");
-        loginTitle.setFont(Font.font("Arial", 40));
-        Label usernameLabel = new Label("Username: ");
-        TextField usernameField = new TextField();
-        Label passwordLabel = new Label("Password: ");
-        PasswordField passwordField = new PasswordField();
-        Button signInButton = new Button("Sign In");
-        
-        // OTP interface
-        Label otpTitle = new Label("OTP dongle");
-        otpTitle.setFont(Font.font("Arial", 40));
-        TextField otpField = new TextField();
-        Button otpButton = new Button("Generate OTP");
-        otpButton.setOnAction(
-            (ActionEvent ae) -> {
-                otpField.setText("ciao");
-            }
+        wrapper.getChildren().addAll(   loginUI.getWrapper(),
+                                        otpUI.getWrapper()
         );
-        
-        loginInterface.getChildren().addAll(loginTitle,
-                                            usernameLabel,
-                                            usernameField,
-                                            passwordLabel,
-                                            passwordField,
-                                            signInButton
-        );
-        otpInterface.getChildren().addAll(  otpTitle,
-                                            otpField,
-                                            otpButton
-        );
-        wrapper.getChildren().addAll(   loginInterface,
-                                        otpInterface
-        );
-        
-        return wrapper;
     }
+   
+    public VBox getWrapper() { return wrapper; }
 }
