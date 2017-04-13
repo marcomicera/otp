@@ -25,7 +25,7 @@ import javax.net.ssl.*;
 public class OTPserver extends Application {
     public void start(Stage stage) {
         // Imports its own certificate
-        System.setProperty("javax.net.ssl.keyStore", "mySrvKeystore");
+        System.setProperty("javax.net.ssl.keyStore", "../../mySrvKeystore");
         System.setProperty("javax.net.ssl.keyStorePassword", "password");
         
         SSLServerSocketFactory ssf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
