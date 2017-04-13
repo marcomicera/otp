@@ -1,25 +1,10 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.net.*;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import javax.net.ssl.*;
 
 public class OTPserver extends Application {
