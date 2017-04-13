@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 // Package di sicurezza
@@ -37,6 +39,8 @@ public class OTPclient extends Application {
         VBox otpInterface = new VBox(5);
         
         // Login interface
+        Label loginTitle = new Label("Home banking login");
+        loginTitle.setFont(Font.font("Arial", 40));
         Label usernameLabel = new Label("Username: ");
         TextField usernameField = new TextField();
         Label passwordLabel = new Label("Password: ");
@@ -44,17 +48,26 @@ public class OTPclient extends Application {
         Button signInButton = new Button("Sign In");
         
         // OTP interface
-        Image otpImage = new Image("file:img/otpUI.png", 250, 250, true, true);
-        ImageView otpImageDisplayer = new ImageView();
-        otpImageDisplayer.setImage(otpImage);
+        Label otpTitle = new Label("OTP dongle");
+        otpTitle.setFont(Font.font("Arial", 40));
+        TextField otpField = new TextField();
+        Button otpButton = new Button("Generate OTP");
+        otpButton.setOnAction(
+            (ActionEvent ae) -> {
+                otpField.setText("ciao");
+            }
+        );
         
-        loginInterface.getChildren().addAll(usernameLabel,
+        loginInterface.getChildren().addAll(loginTitle,
+                                            usernameLabel,
                                             usernameField,
                                             passwordLabel,
                                             passwordField,
                                             signInButton
         );
-        otpInterface.getChildren().addAll(otpImageDisplayer
+        otpInterface.getChildren().addAll(  otpTitle,
+                                            otpField,
+                                            otpButton
         );
         wrapper.getChildren().addAll(   loginInterface,
                                         otpInterface
@@ -64,5 +77,10 @@ public class OTPclient extends Application {
         stage.setTitle("One Time Password client interface");
         stage.setScene(scene);
         stage.show();
+    }
+    
+    private int calculateOTP() {
+        
+        return 1;
     }
 }
