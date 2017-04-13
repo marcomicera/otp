@@ -13,10 +13,10 @@ public class OTPserver extends Application {
         System.setProperty("javax.net.ssl.keyStore", "../../mySrvKeystore");
         System.setProperty("javax.net.ssl.keyStorePassword", "password");
         
-        SSLServerSocketFactory ssf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-        try(ServerSocket ss = ssf.createServerSocket(8080)) {
+        SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+        try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(8080)) {
             while(true) {
-                Socket s = ss.accept();
+                SSLSocket s = (SSLSocket)ss.accept();
 
                 Thread t = new Thread() {
                     public void run() {
