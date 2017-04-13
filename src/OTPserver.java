@@ -40,14 +40,14 @@ public class OTPserver extends Application {
                             Certificate[] cchain2 = session.getLocalCertificates();
 
                             // Prints
-                            for (int i = 0; i < cchain2.length; i++)
+                            /*for (int i = 0; i < cchain2.length; i++)
                                 System.out.println(((X509Certificate) cchain2[i]).getSubjectDN());
                             System.out.println("Peer host is " + session.getPeerHost());
                             System.out.println("Cipher is " + session.getCipherSuite());
                             System.out.println("Protocol is " + session.getProtocol());
                             System.out.println("ID is " + new BigInteger(session.getId()));
                             System.out.println("Session created in " + session.getCreationTime());
-                            System.out.println("Session accessed in " + session.getLastAccessedTime());
+                            System.out.println("Session accessed in " + session.getLastAccessedTime());*/
                             
                             System.out.println("Server received: " + ois.readObject());
                             Thread.sleep(3000);
