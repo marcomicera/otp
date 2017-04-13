@@ -1,0 +1,1 @@
+cls && javac OTPserver.java && java -Djavax.net.ssl.keyStore=mySrvKeystore -Djavax.net.ssl.keyStorePassword=password OTPserver
