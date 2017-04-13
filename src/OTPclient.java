@@ -24,7 +24,8 @@ import javax.crypto.*;
 public class OTPclient extends Application {
     public void start(Stage stage) {
         // Sending an example string
-        try(Socket s = new Socket("localhost", 8080); // Normal bidirectional socket
+        SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        try(Socket s = sf.createSocket("localhost", 8080); // Normal bidirectional socket
             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
         ) { oout.writeObject("ciao, server!");
         } catch(IOException e) { e.printStackTrace(); }
@@ -79,10 +80,5 @@ public class OTPclient extends Application {
         stage.setTitle("One Time Password client interface");
         stage.setScene(scene);
         stage.show();
-    }
-    
-    private int calculateOTP() {
-        
-        return 1;
     }
 }
