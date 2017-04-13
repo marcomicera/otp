@@ -67,10 +67,10 @@ public class LoginUI {
     
     private void sslSend(String message) {
         System.setProperty("javax.net.ssl.trustStore", "../../mySrvKeystore");
-        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
 
-        try(Socket s = ssf.createSocket("localhost", 8080);
-             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
+        try(SSLSocket s = (SSLSocket)sf.createSocket("localhost", 8080);
+            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
         ) {
             SSLSession session = ((SSLSocket)s).getSession();
             Certificate[] cchain = session.getPeerCertificates();
