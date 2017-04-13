@@ -24,11 +24,11 @@ import javax.net.ssl.*;
 
 public class OTPserver extends Application {
     public void start(Stage stage) {
+        // Imports its own certificate
         System.setProperty("javax.net.ssl.keyStore", "mySrvKeystore");
         System.setProperty("javax.net.ssl.keyStorePassword", "password");
         
         SSLServerSocketFactory ssf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-        
         try(ServerSocket ss = ssf.createServerSocket(8080)) {
             while(true) {
                 Socket s = ss.accept();
@@ -38,16 +38,6 @@ public class OTPserver extends Application {
                         try(ObjectInputStream ois = new ObjectInputStream(s.getInputStream())) {
                             SSLSession session = ((SSLSocket) s).getSession();
                             Certificate[] cchain2 = session.getLocalCertificates();
-
-                            // Prints
-                            /*for (int i = 0; i < cchain2.length; i++)
-                                System.out.println(((X509Certificate) cchain2[i]).getSubjectDN());
-                            System.out.println("Peer host is " + session.getPeerHost());
-                            System.out.println("Cipher is " + session.getCipherSuite());
-                            System.out.println("Protocol is " + session.getProtocol());
-                            System.out.println("ID is " + new BigInteger(session.getId()));
-                            System.out.println("Session created in " + session.getCreationTime());
-                            System.out.println("Session accessed in " + session.getLastAccessedTime());*/
                             
                             System.out.println("Server received: " + ois.readObject());
                             Thread.sleep(3000);
@@ -63,9 +53,8 @@ public class OTPserver extends Application {
             ioe.printStackTrace();
         }
         
-        /*
         // Connecting to database
-        try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
+        /*try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
             Statement st = co.createStatement();
         ) {
             ResultSet rs = st.executeQuery("select * from prova");
@@ -73,13 +62,16 @@ public class OTPserver extends Application {
                 System.out.println(rs.getInt("<integer_column_name>") + rs.getString("<string_column_name>"));
         } catch(SQLException e) {
             System.err.println(e.getMessage());
-        }
-
-        Group root = new Group();
-        Scene scene = new Scene(root, 500, 500);
-
-        stage.setTitle("One Time Password server interface");
-        stage.setScene(scene);
-        stage.show();*/
+        }*/
     }
 }
+
+// Useful prints for the future
+/*for (int i = 0; i < cchain2.length; i++)
+    System.out.println(((X509Certificate) cchain2[i]).getSubjectDN());
+System.out.println("Peer host is " + session.getPeerHost());
+System.out.println("Cipher is " + session.getCipherSuite());
+System.out.println("Protocol is " + session.getProtocol());
+System.out.println("ID is " + new BigInteger(session.getId()));
+System.out.println("Session created in " + session.getCreationTime());
+System.out.println("Session accessed in " + session.getLastAccessedTime());*/
