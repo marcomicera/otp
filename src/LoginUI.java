@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.cert.Certificate;
+import java.util.regex.Pattern;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +15,9 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class LoginUI {
-    private final static int    WRAPPER_SPACING = 5;
+    private final static int    WRAPPER_SPACING = 5,
+                                USERNAME_MINIMUM_LENGTH = 1,
+                                PASSWORD_MINIMUM_LENGTH = 1;
 
     private final VBox wrapper;
     private final Label title;
@@ -45,7 +48,13 @@ public class LoginUI {
         
         signInButton.setOnAction(
             (ActionEvent ae) -> {
-                sendCredentials();
+                if( Pattern.matches("\\w{" + USERNAME_MINIMUM_LENGTH + ",}", usernameField.getText())
+                    &&
+                    Pattern.matches("\\w{" + PASSWORD_MINIMUM_LENGTH + ",}", passwordField.getText())
+                ) {
+                    sslSend(usernameField.getText());
+                    sslSend(passwordField.getText());
+                }
             }
         );
 
@@ -56,7 +65,7 @@ public class LoginUI {
         title.setFont(Font.font("Arial", 40));
     }
     
-    private void sendCredentials() {
+    private void sslSend(String message) {
         System.setProperty("javax.net.ssl.trustStore", "mySrvKeystore");
         SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
@@ -66,18 +75,7 @@ public class LoginUI {
             SSLSession session = ((SSLSocket)s).getSession();
             Certificate[] cchain = session.getPeerCertificates();
 
-            // Prints
-            /*System.out.println("The Certificates used by peer");
-            for (int i = 0; i < cchain.length; i++)
-                System.out.println(((X509Certificate) cchain[i]).getSubjectDN());
-            System.out.println("Peer host is " + session.getPeerHost());
-            System.out.println("Cipher is " + session.getCipherSuite());
-            System.out.println("Protocol is " + session.getProtocol());
-            System.out.println("ID is " + new BigInteger(session.getId()));
-            System.out.println("Session created in " + session.getCreationTime());
-            System.out.println("Session accessed in " + session.getLastAccessedTime());*/
-
-            oout.writeObject("Hello, server!");
+            oout.writeObject(message);
         } catch(IOException e) {
             e.printStackTrace(); 
         }

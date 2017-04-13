@@ -31,15 +31,15 @@ public class OTPclient extends Application {
     
     public void start(Stage stage) {
         ui = new ClientUI();
-    
-        // Ciphers code blocks
-        /*private Cipher encrCipher;
-        encrCipher.getInstance("DES");
-        SecretKey key = KeyGenerator.getInstance("DES").generateKey();
-        encrCipher.init(Cipher.ENCRYPT_MODE, key);*/
         
         stage.setTitle("One Time Password client interface");
         stage.setScene(new Scene(ui.getWrapper(), 500, 500));
         stage.show();
     }
 }
+
+// Useful code snippets for ciphers
+/*private Cipher encrCipher;
+encrCipher.getInstance("DES");
+SecretKey key = KeyGenerator.getInstance("DES").generateKey();
+encrCipher.init(Cipher.ENCRYPT_MODE, key);*/
