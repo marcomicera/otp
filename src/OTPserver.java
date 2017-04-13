@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,18 +12,31 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OTPserver extends Application {
+    @Override
     public void start(Stage stage) {
         // Server bidirectional socket
         try(ServerSocket servs = new ServerSocket(8080, 7)) {
             while(true) { 
-                try( Socket s = servs.accept(); // Socket to client
-                     ObjectInputStream oin = new ObjectInputStream(s.getInputStream());
-                   ) { System.out.println("Ricevuto: " + oin.readObject()); }
-                Thread.sleep(3000); // processing
+                Socket s = servs.accept(); // Socket to client
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        try(ObjectInputStream oin = new ObjectInputStream(s.getInputStream())) { 
+                            System.out.println("Ricevuto: " + oin.readObject());
+                            Thread.sleep(3000); // processing
+                        } catch(Exception e) {
+                            Logger.getLogger(OTPserver.class.getName()).log(Level.SEVERE, null, e);
+                        }
+                    }
+                };
             }
-        } catch(Exception e) { e.printStackTrace(); }
+        } catch(IOException ioe) { 
+            Logger.getLogger(OTPserver.class.getName()).log(Level.SEVERE, null, ioe);
+        }
 
         // Connecting to database
         try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/<database_name>?user=root&password=");
