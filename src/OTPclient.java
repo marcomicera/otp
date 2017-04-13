@@ -33,7 +33,7 @@ public class OTPclient extends Application {
         
         try(Socket s = ssf.createSocket("localhost", 8080);
              ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
-        ) { 
+        ) {
             SSLSession session = ((SSLSocket)s).getSession();
             Certificate[] cchain = session.getPeerCertificates();
             
