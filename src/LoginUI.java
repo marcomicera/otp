@@ -17,17 +17,19 @@ import javax.net.ssl.SSLSocketFactory;
 public class LoginUI {
     private final static int    WRAPPER_SPACING = 5,
                                 USERNAME_MINIMUM_LENGTH = 1,
-                                PASSWORD_MINIMUM_LENGTH = 1;
-
+                                PASSWORD_MINIMUM_LENGTH = 1,
+                                OTP_LENGTH = 6;
     private final VBox wrapper;
     private final Label title;
     private final Label usernameLabel;
     private TextField usernameField;
     private final Label passwordLabel;
     private PasswordField passwordField;
+    private final Label otpLabel;
+    private TextField otpField;
     private Button signInButton;
     
-    public LoginUI() {
+    public LoginUI(OTPUI otpUI) {
         wrapper = new VBox(WRAPPER_SPACING);
         
         title = new Label("Home banking login");
@@ -36,6 +38,8 @@ public class LoginUI {
         usernameField = new TextField();
         passwordLabel = new Label("Password: ");
         passwordField = new PasswordField();
+        otpLabel = new Label("OTP: ");
+        otpField = new TextField();
         signInButton = new Button("Sign In");
         
         wrapper.getChildren().addAll(   title,
@@ -43,6 +47,8 @@ public class LoginUI {
                                         usernameField,
                                         passwordLabel,
                                         passwordField,
+                                        otpLabel,
+                                        otpField,
                                         signInButton
         );
         
@@ -51,9 +57,16 @@ public class LoginUI {
                 if( Pattern.matches("\\w{" + USERNAME_MINIMUM_LENGTH + ",}", usernameField.getText())
                     &&
                     Pattern.matches("\\w{" + PASSWORD_MINIMUM_LENGTH + ",}", passwordField.getText())
+                    // add otp check!
                 ) {
-                    sslSend(usernameField.getText());
-                    sslSend(passwordField.getText());
+                    sslSend(
+                        new UserInfos(
+                            usernameField.getText(),
+                            passwordField.getText(),
+                            Integer.parseInt(otpField.getText())
+                        )
+                    );
+                    
                 }
             }
         );
@@ -65,7 +78,7 @@ public class LoginUI {
         title.setFont(Font.font("Arial", 40));
     }
     
-    private void sslSend(String message) {
+    private void sslSend(Object message) {
         System.setProperty("javax.net.ssl.trustStore", "../../mySrvKeystore");
         SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
 
@@ -79,7 +92,7 @@ public class LoginUI {
         } catch(IOException e) {
             e.printStackTrace(); 
         }
-        System.out.println("Message sent.");
+        System.out.println("\"" + message + "\" sent.");
     }
     
     public VBox getWrapper() { return wrapper; }

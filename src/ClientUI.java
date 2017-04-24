@@ -9,8 +9,8 @@ public class ClientUI {
     
     public ClientUI() {
         wrapper = new VBox(WRAPPER_SPACING);
-        loginUI = new LoginUI();
         otpUI = new OTPUI();
+        loginUI = new LoginUI(otpUI);
         
         wrapper.getChildren().addAll(   loginUI.getWrapper(),
                                         otpUI.getWrapper()
