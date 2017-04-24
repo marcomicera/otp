@@ -15,6 +15,7 @@ public class OTPserver extends Application {
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(8080)) {
+            /**/System.out.println("Server started");
             while(true) {
                 SSLSocket s = (SSLSocket)ss.accept();
 
@@ -24,8 +25,15 @@ public class OTPserver extends Application {
                             SSLSession session = ((SSLSocket) s).getSession();
                             Certificate[] cchain2 = session.getLocalCertificates();
                             
-                            System.out.println("Server received: " + ois.readObject());
-                            Thread.sleep(3000);
+                            // Receives username
+                            UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
+                            System.out.println("Username: " + user.getUsername() + " | Password: " + user.getPassword() + " OTP: " + user.getOtp());
+                            
+                            //Thread.sleep(2500);
+                            
+                            // Receives password
+                            /*String password = (String)ois.readObject();
+                            System.out.println(Thread.currentThread().getName() + " received " + password + " as password.");*/
                         } catch(Exception e) {
                             e.printStackTrace();
                         }

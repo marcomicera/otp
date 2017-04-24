@@ -1,3 +1,4 @@
+cp ../OTPclient/build/classes/UserInfos.class build/classes
 @echo off
 cls
 javac src/*.java -cp build/classes -d build/classes
