@@ -43,7 +43,7 @@ public class OTPUI {
                         2) Generate a 4-byte string (Dynamic Truncation)
                             • Let Sbits = DT(HS)
                             • DT, defined below, returns a 31-bit string
-                        3) Compute an HOTP value
+                        3) Compute -an HOTP value
                             • Let Snum  = StToNum(Sbits)
                             • Convert S to a number in 0...2^{31}-1
                         4) Return the HOTP value
