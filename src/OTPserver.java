@@ -27,7 +27,12 @@ public class OTPserver extends Application {
                             
                             // Receives username
                             UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
-                            System.out.println("Username: " + user.getUsername() + " | Password: " + user.getPassword() + " | OTP: " + user.getOtp());
+                            System.out.println(
+                                Thread.currentThread().getName() + " received: " + 
+                                "Username: " + user.getUsername() +
+                                " | Password: " + user.getPassword() + 
+                                " | OTP: " + user.getOtp()
+                            );
                             
                             //Thread.sleep(2500);
                             
