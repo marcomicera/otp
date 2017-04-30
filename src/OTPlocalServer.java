@@ -15,7 +15,7 @@ public class OTPlocalServer extends Application {
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(8080)) {
-            /**/System.out.println("Server started");
+            /**/System.out.println("Local server started");
             while(true) {
                 SSLSocket s = (SSLSocket)ss.accept();
 
