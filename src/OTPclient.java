@@ -2,10 +2,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-// Package di sicurezza
-// https://docs.oracle.com/javase/7/docs/api/javax/crypto/package-summary.html
-import javax.crypto.*;
-
 public class OTPclient extends Application {
     private ClientUI ui;
     
@@ -17,9 +13,3 @@ public class OTPclient extends Application {
         stage.show();
     }
 }
-
-// Useful code snippets for ciphers
-/*private Cipher encrCipher;
-encrCipher.getInstance("DES");
-SecretKey key = KeyGenerator.getInstance("DES").generateKey();
-encrCipher.init(Cipher.ENCRYPT_MODE, key);*/
