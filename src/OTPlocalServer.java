@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 import java.security.cert.Certificate;
 import javax.net.ssl.*;
 
-public class OTPserver extends Application {
+public class OTPlocalServer extends Application {
     public void start(Stage stage) {
         // Imports its own certificate
         System.setProperty("javax.net.ssl.keyStore", "../../serverCertificate");
