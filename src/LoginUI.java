@@ -79,7 +79,7 @@ public class LoginUI {
     }
     
     private void sslSend(Object message) {
-        System.setProperty("javax.net.ssl.trustStore", "../../serverCertificate");
+        System.setProperty("javax.net.ssl.trustStore", "../../localServerCertificate");
         SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
 
         try(SSLSocket s = (SSLSocket)sf.createSocket("localhost", 8080);
