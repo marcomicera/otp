@@ -10,7 +10,7 @@ import javax.net.ssl.*;
 public class OTPlocalServer extends Application {
     public void start(Stage stage) {
         // Imports its own certificate
-        System.setProperty("javax.net.ssl.keyStore", "../../serverCertificate");
+        System.setProperty("javax.net.ssl.keyStore", "../../localServerCertificate");
         System.setProperty("javax.net.ssl.keyStorePassword", "password");
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();

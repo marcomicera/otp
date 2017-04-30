@@ -3,5 +3,5 @@ cp ../OTPclient/build/classes/UserInfos.class build/classes
 cls
 javac src/*.java -cp build/classes -d build/classes
 cd build/classes
-java -Djavax.net.ssl.keyStore=mySrvKeystore -Djavax.net.ssl.keyStorePassword=password OTPlocalServer
+java -Djavax.net.ssl.keyStore=localServerCertificate -Djavax.net.ssl.keyStorePassword=password OTPlocalServer
 cd ../..
