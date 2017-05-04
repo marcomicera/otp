@@ -197,20 +197,11 @@ public class HOTPGenerator {
     }
 
     public static long getCounter() throws IOException {
-        /*   BufferedReader br = new BufferedReader(new InputStreamReader(OTPclient.class.getResourceAsStream("/counter.txt")));
-            String line;
-            long result = 1;
-            while ((line = br.readLine()) != null) {
-                result = Long.parseLong(line);
-            }
-            return result;
-         */
         FileReader fr = new FileReader("Counter.txt");
         BufferedReader br = new BufferedReader(fr);
         String s = "";
         s = br.readLine();
         long result = Long.parseLong(s);
-
         return result;
     }
 
