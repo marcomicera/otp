@@ -32,9 +32,11 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 
@@ -181,40 +183,40 @@ public class HOTPGenerator {
         }
         return result;
     }
-    
+
     //****************************************************************************************************************************
     //Source: http://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java
     public static byte[] hexStringToByteArray(String s) {
-    int len = s.length();
-    byte[] data = new byte[len / 2];
-    for (int i = 0; i < len; i += 2) {
-        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                             + Character.digit(s.charAt(i+1), 16));
-    }
-    return data;
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
     }
 
-    public static long getCounter() throws IOException {     
-            BufferedReader br = new BufferedReader(new InputStreamReader(OTPclient.class.getResourceAsStream("/counter.txt")));
+    public static long getCounter() throws IOException {
+        /*   BufferedReader br = new BufferedReader(new InputStreamReader(OTPclient.class.getResourceAsStream("/counter.txt")));
             String line;
             long result = 1;
             while ((line = br.readLine()) != null) {
                 result = Long.parseLong(line);
             }
             return result;
+         */
+        FileReader fr = new FileReader("Counter.txt");
+        BufferedReader br = new BufferedReader(fr);
+        String s = "";
+        s = br.readLine();
+        long result = Long.parseLong(s);
+
+        return result;
     }
 
-    public static void updateCounter(long counter) throws FileNotFoundException, IOException {
-        String counterStr = Long.toString(counter);
-        try {
-            BufferedWriter out;
-            out = new BufferedWriter(new FileWriter("/counter.txt"));
-            out.write(counterStr);  
-            out.close();
-        } catch (IOException e) {
-            System.out.println("Exception "+ e);
-
+  public static void updateCounter(long counter) throws FileNotFoundException, IOException {
+        try (PrintWriter writeText = new PrintWriter("Counter.txt", "UTF-8")) {
+            writeText.println(counter);
         }
-    }
-    //****************************************************************************************************************************
+    }    //****************************************************************************************************************************
 }
