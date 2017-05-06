@@ -197,7 +197,7 @@ public class HOTPGenerator {
     }
 
     public static long getCounter() throws IOException {
-        FileReader fr = new FileReader("Counter.txt");
+        FileReader fr = new FileReader("../../Counter.txt");
         BufferedReader br = new BufferedReader(fr);
         String s = "";
         s = br.readLine();
