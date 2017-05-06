@@ -16,8 +16,10 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class LoginUI {
     private final static int    WRAPPER_SPACING = 5,
-                                USERNAME_MINIMUM_LENGTH = 1,
-                                PASSWORD_MINIMUM_LENGTH = 1,
+                                USERNAME_MINIMUM_LENGTH = 1, //8
+                                USERNAME_MAXIMUM_LENGTH = 32,
+                                PASSWORD_MINIMUM_LENGTH = 1, //8
+                                PASSWORD_MAXIMUM_LENGTH = 32,
                                 OTP_LENGTH = 6;
     private final VBox wrapper;
     private final Label title;
@@ -54,10 +56,21 @@ public class LoginUI {
         
         signInButton.setOnAction(
             (ActionEvent ae) -> {
-                if( Pattern.matches("\\w{" + USERNAME_MINIMUM_LENGTH + ",}", usernameField.getText())
+                // Checking user inputs (regexp by: https://goo.gl/QPOQVR)
+                if( Pattern.matches(
+                        "^(?=.{" + USERNAME_MINIMUM_LENGTH + "," + USERNAME_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+                        usernameField.getText()
+                    )
                     &&
-                    Pattern.matches("\\w{" + PASSWORD_MINIMUM_LENGTH + ",}", passwordField.getText())
-                    // add otp check!
+                    Pattern.matches(
+                        "^(?=.{" + PASSWORD_MINIMUM_LENGTH + "," + PASSWORD_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", 
+                        passwordField.getText()
+                    )
+                    &&
+                    Pattern.matches(
+                        "\\d{6}", 
+                        otpField.getText()
+                    )
                 ) {
                     sslSend(
                         new UserInfos(
