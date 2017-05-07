@@ -73,6 +73,7 @@ public class OTPremoteServer extends Application {
             );
             Statement st = co.createStatement();
         ) {
+            //System.out.println(encrCipher.doFinal(username.getBytes()));
             query = "SELECT * FROM users WHERE username = \"" +
                 encrCipher.doFinal(username.getBytes()) +
                 "\""
@@ -81,12 +82,12 @@ public class OTPremoteServer extends Application {
             ResultSet rs = st.executeQuery(query);
             
             rs.next();
-            System.out.println(rs.getString("password"));
+            //System.out.println(rs.getString("password"));
             
-            /*if(encrCipher.doFinal(password.getBytes()) == rs.getString("password").getBytes())
+            if(encrCipher.doFinal(password.getBytes()) == rs.getString("password").getBytes())
                 System.out.println(username + " logged successfully.");
             else
-                System.out.println(username + ": password do not match.");*/
+                System.out.println(username + ": password do not match.");
         } catch(SQLException e) {
             System.err.println(e.getMessage());
         } catch (IllegalBlockSizeException ex) {
