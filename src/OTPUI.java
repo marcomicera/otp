@@ -41,7 +41,7 @@ public class OTPUI {
                     
                     String HOTPString ="";
                     try {
-                        HOTPGenerator htopgen = new HOTPGenerator();
+                        HOTPGenerator htopgen = new HOTPGenerator(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
                         byte[] secret = HOTPGenerator.hexStringToByteArray("18732149");
                         long movingFactor;
                         movingFactor = HOTPGenerator.getCounter();
