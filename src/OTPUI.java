@@ -2,6 +2,7 @@
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -38,11 +39,25 @@ public class OTPUI {
 
         otpButton.setOnAction(
                 (ActionEvent ae) -> {
-                    
+                    //Interrompo la generazione di un nuovo codice
+                    new Thread("Timer thread on going") {
+                        @Override
+                        public void run() {
+                            otpButton.setDisable(true); // Disattivo tasto generate otp
+                            try {
+                                Thread.sleep(5000); // Tasto generate otp bloccato per tot secondi
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(OTPUI.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            System.out.println("Thread: " + getName() + " running");
+                            otpButton.setDisable(false); // Lo riattivo
+                        }
+                    }.start();
+
                     String HOTPString ="";
                     try {
                         HOTPGenerator htopgen = new HOTPGenerator(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
-                        byte[] secret = HOTPGenerator.hexStringToByteArray("18732149");
+                        byte[] secret = HOTPGenerator.hexStringToByteArray("14FEA54A019BC73A");
                         long movingFactor;
                         movingFactor = HOTPGenerator.getCounter();
                         System.out.println("Valore counter: " + movingFactor);

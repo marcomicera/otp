@@ -30,12 +30,9 @@
     * documentation and/or software.
  */
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
@@ -207,7 +204,7 @@ public class HOTPGenerator {
     }
 
   public static void updateCounter(long counter) throws FileNotFoundException, IOException {
-        try (PrintWriter writeText = new PrintWriter("Counter.txt", "UTF-8")) {
+        try (PrintWriter writeText = new PrintWriter("../../Counter.txt", "UTF-8")) {
             writeText.println(counter);
         }
     }    //****************************************************************************************************************************
