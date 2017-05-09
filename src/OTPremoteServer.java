@@ -24,11 +24,11 @@ import javax.crypto.SecretKey;
 
 /*
 
-Algorithm: AES
-    • Why
-Encryption mode: CBC
-    • Why
-Padding: PKCS#5
+Algorithm: AES ?
+    • Why it is better than DES
+Encryption mode: CBC ?
+    • Why it is better than ECB
+Padding: PKCS#5 ?
     • Why
 
 */
