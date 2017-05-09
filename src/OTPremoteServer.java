@@ -34,62 +34,46 @@ Padding: PKCS#5 ?
 */
 
 public class OTPremoteServer extends Application {
-    private static final String ENCR_ALGORITHM = "AES"; // blocks of 16B
-    private Cipher encrCipher;
-    private SecretKey key;
+    
+    //private Cipher encrCipher;
+    
     
     public void start(Stage stage) {
         System.out.println("Remote server started");
         
-        initializeCipher();
-        
+       
         // Utenti di prova già inseriti
-        insertUser("giovanni862", "camaleonte9", "4@sdaàwq#5".getBytes(), 0);
-        insertUser("ste778", "ponte73", "@ads_wqe".getBytes(), 2);
-        insertUser("giginoto", "a32stro", "1221#]_qwe".getBytes(), 0);
+        //insertUser("giovanni862", "camaleonte9", "4@sdaàwq#5".getBytes(), 0);
+        //insertUser("ste778", "ponte73", "@ads_wqe".getBytes(), 2);
+        //insertUser("giginoto", "a32stro", "1221#]_qwe".getBytes(), Long.MAX_VALUE);
         
         //loginCheck("giovanni862", "camaleonte9");
         //loginCheck("giovanni862", "camaleont9");
-        
-        /*try {
-            // Prints infos
-            System.out.println("What has been crypted: " + username);
-            for(int i = 0; i < encr_username.length; ++i)
-                System.out.println(new Byte(encr_username[i]));
-            System.out.println("Encrypted message: " + encr_username);
-            System.out.println("Encrypted message length: " + encr_username.length);
-            
-            //loginCheck("username_prova", "password_prova");
-        } catch(Exception e) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
-        }*/
     }
     
-    private void initializeCipher() {
+    /*private void initializeCipher() {
         try {
             encrCipher = encrCipher.getInstance(ENCR_ALGORITHM);
             key = KeyGenerator.getInstance(ENCR_ALGORITHM).generateKey();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
     
-    private byte[] encrypt(Object data) {
+    /*private byte[] encrypt(Object data) {
         byte[] encrypted_data = null;
         
         try {
             encrCipher.init(Cipher.ENCRYPT_MODE, key);
             encrypted_data = encrCipher.doFinal(serialize(data));
-        } catch(InvalidKeyException | IOException | IllegalBlockSizeException | BadPaddingException ex) {
+        } catch(InvalidKeyException | IllegalBlockSizeException | IOExceptio/ | BadPaddingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return encrypted_data;
-    }
+    }*/
     
-    public void loginCheck(String username, String password) {
+    /*public void loginCheck(String username, String password) {
         String query = "";
         
         try(// SSL not used in the bank
@@ -121,28 +105,16 @@ public class OTPremoteServer extends Application {
         } catch (BadPaddingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
+    }*/
     
-    public void insertUser(String username, String password, byte[] key, long counter) {
+    /*public void insertUser(String username, String password, byte[] key, long counter) {
         String query = "";
 
         // long to byte[] conversion
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(counter);
         
-        //try {
-            /*query =
-                "INSERT INTO users VALUES (\"" +
-                encrCipher.doFinal(username.getBytes()) +
-                "\", \"" +
-                encrCipher.doFinal(password.getBytes()) +
-                "\", \"" +
-                encrCipher.doFinal(key) +
-                "\", \"" +
-                encrCipher.doFinal(buffer.array()) +
-                "\");"
-            ;*/
-            
+        try {
             query =
                 "INSERT INTO users VALUES (\"" +
                 encrypt(username) +
@@ -154,11 +126,11 @@ public class OTPremoteServer extends Application {
                 encrypt(counter) +
                 "\");"
             ;
-        /*} catch (IllegalBlockSizeException ex) {
+        } catch (IllegalBlockSizeException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadPaddingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
         
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
@@ -171,20 +143,20 @@ public class OTPremoteServer extends Application {
         } catch(SQLException e) {
             System.err.println(e.getMessage());
         }
-    }
+    }*/
     
     // from Object to byte[]
-    private static byte[] serialize(Object obj) throws IOException {
+    /*private static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
         return out.toByteArray();
-    }
+    }*/
 
     // from byte[] to Object
-    private static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+    /*private static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
-    }
+    }*/
 }
