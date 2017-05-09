@@ -2,5 +2,5 @@
 cls
 javac src/*.java -cp build/classes -d build/classes
 cd build/classes
-java -Djavax.net.ssl.trustStore=mySrvKeystore -Djavax.net.ssl.trustStorePassword=password OTPclient
+java -Djavax.net.ssl.trustStore=localServerCertificate -Djavax.net.ssl.trustStorePassword=password OTPclient
 cd ../..
