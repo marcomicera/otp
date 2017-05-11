@@ -21,11 +21,10 @@ public class OTPremoteServer extends Application {
         System.out.println("Remote server started");
         
         try {
-            byte[] encryptionKey = "MZygpewJsCpRrfOr".getBytes(/*StandardCharsets.UTF_8*/); // 128 bits
-            byte[] plainText = "Hello world!".getBytes(/*StandardCharsets.UTF_8*/);
-            Encryptor advancedEncryptionStandard = new Encryptor(/*encryptionKey*/);
-            byte[] cipherText = advancedEncryptionStandard.encrypt(plainText);
-            byte[] decryptedCipherText = advancedEncryptionStandard.decrypt(cipherText);
+            byte[] plainText = "Hello world!".getBytes();
+            Encryptor encr = new Encryptor();
+            byte[] cipherText = encr.encrypt(plainText);
+            byte[] decryptedCipherText = encr.decrypt(cipherText);
             
             System.out.println(new String(plainText));
             System.out.println(new String(cipherText));
