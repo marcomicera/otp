@@ -17,9 +17,9 @@ import javax.net.ssl.SSLSocketFactory;
 public class LoginUI {
     private final static int    WRAPPER_SPACING = 5,
                                 USERNAME_MINIMUM_LENGTH = 1, //8
-                                USERNAME_MAXIMUM_LENGTH = 32,
+                                USERNAME_MAXIMUM_LENGTH = 31,
                                 PASSWORD_MINIMUM_LENGTH = 1, //8
-                                PASSWORD_MAXIMUM_LENGTH = 32,
+                                PASSWORD_MAXIMUM_LENGTH = 31,
                                 OTP_LENGTH = 6;
     private final VBox wrapper;
     private final Label title;
