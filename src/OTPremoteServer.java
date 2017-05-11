@@ -1,26 +1,8 @@
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.ByteBuffer;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 
 /*
 
@@ -35,43 +17,23 @@ Padding: PKCS#5 ?
 
 public class OTPremoteServer extends Application {
     
-    //private Cipher encrCipher;
-    
-    
     public void start(Stage stage) {
         System.out.println("Remote server started");
         
-       
-        // Utenti di prova già inseriti
-        //insertUser("giovanni862", "camaleonte9", "4@sdaàwq#5".getBytes(), 0);
-        //insertUser("ste778", "ponte73", "@ads_wqe".getBytes(), 2);
-        //insertUser("giginoto", "a32stro", "1221#]_qwe".getBytes(), Long.MAX_VALUE);
-        
-        //loginCheck("giovanni862", "camaleonte9");
-        //loginCheck("giovanni862", "camaleont9");
+        try {
+            byte[] encryptionKey = "MZygpewJsCpRrfOr".getBytes(/*StandardCharsets.UTF_8*/);
+            byte[] plainText = "Hello world!".getBytes(/*StandardCharsets.UTF_8*/);
+            Encryptor advancedEncryptionStandard = new Encryptor(encryptionKey);
+            byte[] cipherText = advancedEncryptionStandard.encrypt(plainText);
+            byte[] decryptedCipherText = advancedEncryptionStandard.decrypt(cipherText);
+            
+            System.out.println(new String(plainText));
+            System.out.println(new String(cipherText));
+            System.out.println(new String(decryptedCipherText));
+        } catch (Exception ex) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
-    /*private void initializeCipher() {
-        try {
-            encrCipher = encrCipher.getInstance(ENCR_ALGORITHM);
-            key = KeyGenerator.getInstance(ENCR_ALGORITHM).generateKey();
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }*/
-    
-    /*private byte[] encrypt(Object data) {
-        byte[] encrypted_data = null;
-        
-        try {
-            encrCipher.init(Cipher.ENCRYPT_MODE, key);
-            encrypted_data = encrCipher.doFinal(serialize(data));
-        } catch(InvalidKeyException | IllegalBlockSizeException | IOExceptio/ | BadPaddingException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return encrypted_data;
-    }*/
     
     /*public void loginCheck(String username, String password) {
         String query = "";
