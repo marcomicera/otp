@@ -1,10 +1,14 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -12,7 +16,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -31,60 +39,47 @@ public class Encryptor {
 
     public Encryptor() {
         try {
-            //Guardo se esiste il file key
-            if (keyExists()) {
-                System.out.println("la chiave esiste");
-                String mykey = getAESKeyDB();//"1234567891234567";
-                key = new SecretKeySpec(mykey.getBytes(), "AES");
+            if(keyExists()) {
+                System.out.println("Key exists: fetching it...");
+                key = getAESKey();
             } else {
-                System.out.println("la chiave non esiste");
+                System.out.println("Key does not exist: creating it...");
                 KeyGenerator keyGen = KeyGenerator.getInstance("AES");
                 keyGen.init(KEY_LENGHT);
                 key = keyGen.generateKey();
-                storeAESKeyDB(key);//Salvo chiave nel file
+                storeAESKeyDB(key);
             }
-            // get base64 encoded version of the key
-            String encodedKeyFile = Base64.getEncoder().encodeToString(key.getEncoded()); //http://stackoverflow.com/questions/5355466/converting-secret-key-into-a-string-and-vice-versa
-            System.out.println("key2 : " + encodedKeyFile);
-        } catch (NoSuchAlgorithmException | IOException ex) {
+        } catch(NoSuchAlgorithmException ex) {
             Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static boolean keyExists() throws IOException {
+    public static boolean keyExists() {
         File f = new File("../../Key");
         return f.exists();
     }
 
-    public static String getAESKeyDB() throws IOException {
-        FileReader fr = new FileReader("../../Key");
-        BufferedReader br = new BufferedReader(fr);
-        String s = "";
-        s = br.readLine();
-        return s;
+    public static SecretKeySpec getAESKey() {
+        try(FileInputStream fin = new FileInputStream("../../Key");
+            ObjectInputStream oin = new ObjectInputStream(fin);
+        ) {
+            return (SecretKeySpec)oin.readObject();  
+        } catch(FileNotFoundException | ClassNotFoundException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch(IOException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 
     public static void storeAESKeyDB(SecretKey key) {
-        try {
-            String encodedKeyFile = Base64.getEncoder().encodeToString(key.getEncoded());//converto SecretKey in una chiave string per salvarla nel DB
-            System.out.println("key2 from function: " + encodedKeyFile);
-            File file = new File("../../Key");
-            if (file.createNewFile()) {
-                System.out.println("File Key is created!");
-            } else {
-                System.out.println("File Key already exists.");
-            }
-
-            FileWriter fw;
-            fw = new FileWriter(file, true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw);
-                out.println(encodedKeyFile);
-
-                //PrintWriter writeText = new PrintWriter("../../Key", "UTF-8");
-                //writeText.println(encodedKeyFile);
-            }catch (IOException ex) {
-            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        try(FileOutputStream fout = new FileOutputStream("../../Key");
+            ObjectOutputStream oout = new ObjectOutputStream(fout);
+        ) {
+            oout.writeObject(key);               
+        } catch(IOException ioe) {
+            System.out.println("Error while saving generated key.");
         }
     }
 
@@ -102,10 +97,9 @@ public class Encryptor {
     public byte[] encrypt(int plainText) throws GeneralSecurityException  {
         return encrypt(ByteBuffer.allocate(4).putInt(plainText).array());
     }
-    
-    // does not work
+
     public byte[] encrypt(long plainText) throws GeneralSecurityException  {
-        return encrypt(ByteBuffer.allocate(4).putLong(plainText).array());
+        return encrypt(longToBytes(plainText));
     }
 
     public byte[] decrypt(byte[] cipherText) throws GeneralSecurityException  {
@@ -115,11 +109,31 @@ public class Encryptor {
         return cipher.doFinal(cipherText);
     }
     
-    public int byteArrayToInt(byte[] array) {
+    // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+    public static byte[] longToBytes(long l) {
+        byte[] result = new byte[8];
+        for(int i = 7; i >= 0; i--) {
+            result[i] = (byte)(l & 0xFF);
+            l >>= 8;
+        }
+        return result;
+    }
+    
+    // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+    public static long bytesToLong(byte[] b) {
+        long result = 0;
+        for(int i = 0; i < 8; i++) {
+            result <<= 8;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
+    
+    /*public int byteArrayToInt(byte[] array) {
         return ByteBuffer.wrap(array).getInt();
     }
     
     public long byteArrayToLong(byte[] array) {
         return ByteBuffer.wrap(array).getLong();
-    }
+    }*/
 }

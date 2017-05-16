@@ -3,6 +3,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -20,59 +26,53 @@ Padding: PKCS#5 ?
 */
 
 public class OTPremoteServer extends Application {
+    Encryptor encr;
     
     public void start(Stage stage) {
         System.out.println("Remote server started");
         
         try {
-            //Test crypting e decrypting di una Stringa
-            System.out.println("Test crypting e decrypting di una stringa");
-            byte[] plainText = "Hello world!".getBytes();
-            Encryptor encr = new Encryptor();
-            byte[] cipherText = encr.encrypt(plainText);
-            byte[] decryptedCipherText = encr.decrypt(cipherText);
+            encr = new Encryptor();
             
-            System.out.println(new String(plainText));
-            System.out.println(new String(cipherText));
-            System.out.println(new String(decryptedCipherText));
+            // String encrypting and decrypting test
+            System.out.println("\n *** String encrypting and decrypting test ***");
+            String stringPlainText = "Hello world! 2ws";
+            byte[] stringCipherText = encr.encrypt(stringPlainText);
+            byte[] decryptedStringCipherText = encr.decrypt(stringCipherText);
+            System.out.println("Plaintext:\t\t" + new String(stringPlainText) +
+                "\t\t\tSize:\t" + stringPlainText.length()
+            );
+            System.out.println("Ciphertext:\t\t" + new String(stringCipherText) +
+                "\tSize:\t" + stringCipherText.length
+            );
+            System.out.println("Decrypted plaintext:\t" + new String(decryptedStringCipherText) +
+                "\t\t\tSize:\t" + decryptedStringCipherText.length  + "\n"
+            );
             
-            //Test crypting e decrypting di un long (contatore all'interno del dongle)
-            System.out.println("Test crypting e decrypting di un long");
-            long plainTextKEY = Long.MAX_VALUE;
-            byte[] plainTextLong = longToBytes(plainTextKEY);
-            byte[] cipherTextLong = encr.encrypt(plainTextLong);
-            byte[] decryptedCipherTextLong = encr.decrypt(cipherTextLong);
-            System.out.println(plainTextKEY);
-            System.out.println(bytesToLong(cipherTextLong));
-            System.out.println(bytesToLong(decryptedCipherTextLong));
+            // Long encrypting and decrypting test
+            System.out.println("*** Long encrypting and decrypting test ***");
+            long longPlainText = Long.MAX_VALUE;
+            byte[] longCipherText = encr.encrypt(longPlainText);
+            byte[] decryptedLongCipherText = encr.decrypt(longCipherText);
+            System.out.println("Plaintext:\t\t" + longPlainText +
+                "\t\tSize:\t" + Long.BYTES
+            );
+            System.out.println("Ciphertext:\t\t" + encr.bytesToLong(longCipherText) +
+                "\t\tSize:\t" + longCipherText.length
+            );
+            System.out.println("Decrypted plaintext:\t" + encr.bytesToLong(decryptedLongCipherText) +
+                "\t\tSize:\t" + decryptedLongCipherText.length + "\n"
+            );
             
         } catch (Exception ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //Inserisco nel database String RiccardoRocchi String Password, dongle_key, dongle_counter
+        
+        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç".getBytes(), Long.MAX_VALUE);
+        loginCheck("giovanni283", "gvn28__2");
     }
 
-    
-    //http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
-public static byte[] longToBytes(long l) {
-    byte[] result = new byte[8];
-    for (int i = 7; i >= 0; i--) {
-        result[i] = (byte)(l & 0xFF);
-        l >>= 8;
-    }
-    return result;
-}
-//http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
-public static long bytesToLong(byte[] b) {
-    long result = 0;
-    for (int i = 0; i < 8; i++) {
-        result <<= 8;
-        result |= (b[i] & 0xFF);
-    }
-    return result;
-}
-
-    /*public void loginCheck(String username, String password) {
+    public void loginCheck(String username, String password) {
         String query = "";
         
         try(// SSL not used in the bank
@@ -82,54 +82,45 @@ public static long bytesToLong(byte[] b) {
             );
             Statement st = co.createStatement();
         ) {
-            //System.out.println(encrCipher.doFinal(username.getBytes()));
-            query = "SELECT * FROM users WHERE username = \"" +
-                encrypt(username) +
-                "\""
-            ;
+            query = "SELECT * FROM users WHERE username = \"" + username + "\"";
         
             ResultSet rs = st.executeQuery(query);
             
             rs.next();
-            //System.out.println(rs.getString("password"));
             
-            if(encrCipher.doFinal(password.getBytes()) == rs.getString("password").getBytes())
+            String decryptedPassword = encr.decrypt(rs.getString("password").getBytes()).toString();
+            if(decryptedPassword == password)
                 System.out.println(username + " logged successfully.");
             else
                 System.out.println(username + ": password do not match.");
         } catch(SQLException e) {
             System.err.println(e.getMessage());
-        } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
+        } catch(GeneralSecurityException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }*/
-    /*
+    }
+    
     public void insertUser(String username, String password, byte[] key, long counter) {
         String query = "";
-
-        // long to byte[] conversion
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(counter);
+        byte[] counterBytes = encr.longToBytes(counter); 
         
         try {
             query =
                 "INSERT INTO users VALUES (\"" +
-                encrypt(username) +
+                username +
                 "\", \"" +
-                encrypt(password) +
+                encr.encrypt(password) +
                 "\", \"" +
-                encrypt(key) +
+                encr.encrypt(key) +
                 "\", \"" +
-                encrypt(counter) +
+                encr.encrypt(counter) +
                 "\");"
             ;
-        } catch (IllegalBlockSizeException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
+        } catch(GeneralSecurityException ex) { 
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        /**/System.out.println(query);
         
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
