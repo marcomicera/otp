@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +25,8 @@ public class OTPremoteServer extends Application {
         System.out.println("Remote server started");
         
         try {
+            //Test crypting e decrypting di una Stringa
+            System.out.println("Test crypting e decrypting di una stringa");
             byte[] plainText = "Hello world!".getBytes();
             Encryptor encr = new Encryptor();
             byte[] cipherText = encr.encrypt(plainText);
@@ -29,11 +35,43 @@ public class OTPremoteServer extends Application {
             System.out.println(new String(plainText));
             System.out.println(new String(cipherText));
             System.out.println(new String(decryptedCipherText));
+            
+            //Test crypting e decrypting di un long (contatore all'interno del dongle)
+            System.out.println("Test crypting e decrypting di un long");
+            long plainTextKEY = Long.MAX_VALUE;
+            byte[] plainTextLong = longToBytes(plainTextKEY);
+            byte[] cipherTextLong = encr.encrypt(plainTextLong);
+            byte[] decryptedCipherTextLong = encr.decrypt(cipherTextLong);
+            System.out.println(plainTextKEY);
+            System.out.println(bytesToLong(cipherTextLong));
+            System.out.println(bytesToLong(decryptedCipherTextLong));
+            
         } catch (Exception ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //Inserisco nel database String RiccardoRocchi String Password, dongle_key, dongle_counter
     }
+
     
+    //http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+public static byte[] longToBytes(long l) {
+    byte[] result = new byte[8];
+    for (int i = 7; i >= 0; i--) {
+        result[i] = (byte)(l & 0xFF);
+        l >>= 8;
+    }
+    return result;
+}
+//http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+public static long bytesToLong(byte[] b) {
+    long result = 0;
+    for (int i = 0; i < 8; i++) {
+        result <<= 8;
+        result |= (b[i] & 0xFF);
+    }
+    return result;
+}
+
     /*public void loginCheck(String username, String password) {
         String query = "";
         
@@ -67,8 +105,8 @@ public class OTPremoteServer extends Application {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }*/
-    
-    /*public void insertUser(String username, String password, byte[] key, long counter) {
+    /*
+    public void insertUser(String username, String password, byte[] key, long counter) {
         String query = "";
 
         // long to byte[] conversion
@@ -104,7 +142,7 @@ public class OTPremoteServer extends Application {
         } catch(SQLException e) {
             System.err.println(e.getMessage());
         }
-    }*/
+    }
     
     // from Object to byte[]
     /*private static byte[] serialize(Object obj) throws IOException {
