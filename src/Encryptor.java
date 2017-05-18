@@ -109,6 +109,10 @@ public class Encryptor {
         return cipher.doFinal(cipherText);
     }
     
+    public byte[] decrypt(String cipherText) throws GeneralSecurityException  {
+        return decrypt(cipherText.getBytes());
+    }
+    
     // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
     public static byte[] longToBytes(long l) {
         byte[] result = new byte[8];
