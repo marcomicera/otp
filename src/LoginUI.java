@@ -21,6 +21,7 @@ public class LoginUI {
                                 PASSWORD_MINIMUM_LENGTH = 1, //8
                                 PASSWORD_MAXIMUM_LENGTH = 32,
                                 OTP_LENGTH = 6;
+    private final static String FONT = "Arial";
     private final VBox wrapper;
     private final Label title;
     private final Label usernameLabel;
@@ -68,7 +69,7 @@ public class LoginUI {
                     )
                     &&
                     Pattern.matches(
-                        "\\d{6}", 
+                        "\\d{" + OTP_LENGTH + "}", 
                         otpField.getText()
                     )
                 ) {
@@ -88,7 +89,7 @@ public class LoginUI {
     }
     
     private void setStyle() {
-        title.setFont(Font.font("Arial", 40));
+        title.setFont(Font.font(FONT, 40));
     }
     
     private void sslSend(Object message) {
