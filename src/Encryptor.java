@@ -83,6 +83,9 @@ public class Encryptor {
         }
     }
 
+    //  ATTENZIONE
+    /*  Verificare che nel ciphertext non siano presenti caratteri che facciano
+        errori durante l'inserimento di record in SQL. */
     public byte[] encrypt(byte[] plainText) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key);
