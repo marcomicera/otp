@@ -15,6 +15,7 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
+import org.apache.commons.lang.*;
 
 /*  Algorithm: AES
         • Why it is better than DES
@@ -33,6 +34,8 @@ public class OTPremoteServer extends Application {
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
+        
+        inserts();
         
         try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(8081)) {
             System.out.println("Remote server started");
@@ -68,11 +71,11 @@ public class OTPremoteServer extends Application {
                 "INSERT INTO users VALUES (\"" +
                 username +
                 "\", \"" +
-                new String(encr.encrypt(password)) +
+                StringEscapeUtils.escapeSql(new String(encr.encrypt(password))) +
                 "\", \"" +
-                new String(encr.encrypt(key)) +
+                StringEscapeUtils.escapeSql(new String(encr.encrypt(key))) +
                 "\", \"" +
-                new String(encr.encrypt(counter)) +
+                StringEscapeUtils.escapeSql(new String(encr.encrypt(counter))) +
                 "\");"
             ;
         } catch(GeneralSecurityException ex) { 
@@ -126,7 +129,7 @@ public class OTPremoteServer extends Application {
     
     // Test
     private void stringEncryptionTest() {
-        /*try {
+        try {
             // String encrypting and decrypting test
             System.out.println("\n *** String encrypting and decrypting test ***");
             String stringPlainText = "Hello world! 2ws";
@@ -143,12 +146,12 @@ public class OTPremoteServer extends Application {
             );
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
     }
     
     // Test
     private void longEncryptionTest() {
-        /*try {
+        try {
             // Long encrypting and decrypting test
             System.out.println("*** Long encrypting and decrypting test ***");
             long longPlainText = Long.MAX_VALUE;
@@ -165,12 +168,12 @@ public class OTPremoteServer extends Application {
             );
         } catch (GeneralSecurityException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
     }
     
     // Inserts
     private void inserts() {
-        /*insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182);
+        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182);
         insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641);
         insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121);
         insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17);
@@ -178,6 +181,6 @@ public class OTPremoteServer extends Application {
         insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611);
         insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141);
         insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212);
-        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108);*/
+        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108);
     }
 }
