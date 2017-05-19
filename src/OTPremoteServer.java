@@ -4,6 +4,7 @@ import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,7 +16,6 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import org.apache.commons.lang.*;
 
 /*  Algorithm: AES
         • Why it is better than DES
@@ -34,8 +34,6 @@ public class OTPremoteServer extends Application {
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
-        
-        inserts();
         
         try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(8081)) {
             System.out.println("Remote server started");
@@ -63,37 +61,24 @@ public class OTPremoteServer extends Application {
     }
     
     public void insertUser(String username, String password, byte[] key, long counter) {
-        String query = "";
+        String query = "INSERT INTO users VALUES (?, ?, ?, ?);";
         byte[] counterBytes = encr.longToBytes(counter); 
-        
-        try {
-            query =
-                "INSERT INTO users VALUES (\"" +
-                username +
-                "\", \"" +
-                StringEscapeUtils.escapeSql(new String(encr.encrypt(password))) +
-                "\", \"" +
-                StringEscapeUtils.escapeSql(new String(encr.encrypt(key))) +
-                "\", \"" +
-                StringEscapeUtils.escapeSql(new String(encr.encrypt(counter))) +
-                "\");"
-            ;
-        } catch(GeneralSecurityException ex) { 
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        /**/System.out.println(query);
-        
+
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
-            Statement st = co.createStatement();
+            PreparedStatement ps = co.prepareStatement(query);
         ) {
-            st.executeUpdate(query);
-        } catch(SQLException e) {
-            System.err.println(e.getMessage());
+            ps.setString(1, username);
+            ps.setString(2, new String(encr.encrypt(password)));
+            ps.setString(3, new String(encr.encrypt(key)));
+            ps.setString(4, new String(encr.encrypt(counter)));
+
+            ps.executeUpdate();
+        } catch(SQLException | GeneralSecurityException e) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
