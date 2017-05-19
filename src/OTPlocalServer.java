@@ -9,18 +9,30 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.*;
 
 public class OTPlocalServer extends Application {
+    // Its own address
+    // private final static String ADDRESS = "localhost";
+    private final static int    PORT = 8080;
+    
+    // Its own certificate
+    private final static String CERTIFICATE_NAME = "../../localServerCertificate",
+                                CERTIFICATE_PASSWORD = "password";
+    
+    // Remote server address
     private final static String REMOTE_SERVER_ADDRESS = "localhost";
-    private final static int    REMOTE_SERVER_PORT = 8081,
-                                PORT = 8080;
+    private final static int    REMOTE_SERVER_PORT = 8081;
+    
+    // Remote server certificate
+    private final static String REMOTE_SERVER_CERTIFICATE_NAME = "../../remoteServerCertificate",
+                                REMOTE_SERVER_CERTIFICATE_PASSWORD = "password";
     
     public void start(Stage stage) {
         // Imports its own certificate
-        System.setProperty("javax.net.ssl.keyStore", "../../localServerCertificate");
-        System.setProperty("javax.net.ssl.keyStorePassword", "password");
+        System.setProperty("javax.net.ssl.keyStore", CERTIFICATE_NAME);
+        System.setProperty("javax.net.ssl.keyStorePassword", CERTIFICATE_PASSWORD);
         
         SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(PORT)) {
-            System.out.println("Local server started");
+            System.out.println("Local server started\n");
             while(true) {
                 SSLSocket s = (SSLSocket)ss.accept();
 
@@ -28,22 +40,24 @@ public class OTPlocalServer extends Application {
                     public void run() {
                         try(ObjectInputStream ois = new ObjectInputStream(s.getInputStream())) {
                             SSLSession session = ((SSLSocket)s).getSession();
-                            // Certificate[] certificate = session.getLocalCertificates(); // localServerCertificate
                             
-                            // Receives username
+                            // Receives user infos
                             UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
-                            System.out.println(
-                                Thread.currentThread().getName() + " received: " + 
-                                "Username: " + user.getUsername() +
-                                " | Password: " + user.getPassword() + 
-                                " | OTP: " + user.getOtp()
+                            System.out.println("Received: " + user);
+                            
+                            // Checking OTP
+                            // ...
+
+                            // Sending data to the remote server
+                            sslSend(
+                                user,
+                                REMOTE_SERVER_ADDRESS,
+                                REMOTE_SERVER_PORT,
+                                REMOTE_SERVER_CERTIFICATE_NAME,
+                                REMOTE_SERVER_CERTIFICATE_PASSWORD
                             );
                             
-                            //Thread.sleep(2500);
-                            
-                            // Receives password
-                            /*String password = (String)ois.readObject();
-                            System.out.println(Thread.currentThread().getName() + " received " + password + " as password.");*/
+                            System.out.print("\n");
                         } catch(Exception e) {
                             e.printStackTrace();
                         }
@@ -57,11 +71,12 @@ public class OTPlocalServer extends Application {
         }
     }
     
-    private void sslSend(Object message) {
-        System.setProperty("javax.net.ssl.trustStore", "../../remoteServerCertificate");
+    private void sslSend(Object message, String address, int port, String certificate, String password) {
+        System.setProperty("javax.net.ssl.trustStore", certificate);
+        System.setProperty("javax.net.ssl.trustStorePassword", password);
         SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
 
-        try(SSLSocket s = (SSLSocket)sf.createSocket(REMOTE_SERVER_ADDRESS, REMOTE_SERVER_PORT);
+        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
         ) {
             SSLSession session = ((SSLSocket)s).getSession();
