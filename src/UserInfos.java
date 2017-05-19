@@ -10,13 +10,13 @@ class UserInfos implements Serializable {
         password = p;
         otp = o;
     }
-
-    /*protected void setUsername(String username) { this.username = username; }
-    protected void setPassword(String password) { this.password = password; }
-    protected void setOtp(int otp) { this.otp = otp; }*/
     
-    // to be deleted in the future
-    /**/public String getUsername() { return username; }
-    /**/public String getPassword() { return password; }
-    /**/public int getOtp() { return otp; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public int getOtp() { return otp; }
+    
+    @Override
+    public String toString() {
+        return "[user: " + username + " | password: " + password + " | otp: " + otp + "]";
+    }
 }

@@ -15,6 +15,15 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class LoginUI {
+    // Local server address
+    private final static String LOCAL_SERVER_ADDRESS = "localhost";
+    private final static int    LOCAL_SERVER_PORT = 8080;
+    
+    // Local server certificate
+    private final static String LOCAL_SERVER_CERTIFICATE_NAME = "../../localServerCertificate",
+                                LOCAL_SERVER_CERTIFICATE_PASSWORD = "password";
+    
+    // Style
     private final static int    WRAPPER_SPACING = 5,
                                 USERNAME_MINIMUM_LENGTH = 1, //8
                                 USERNAME_MAXIMUM_LENGTH = 32,
@@ -22,6 +31,8 @@ public class LoginUI {
                                 PASSWORD_MAXIMUM_LENGTH = 32,
                                 OTP_LENGTH = 6;
     private final static String FONT = "Arial";
+
+    // UI elements
     private final VBox wrapper;
     private final Label title;
     private final Label usernameLabel;
@@ -78,7 +89,11 @@ public class LoginUI {
                             usernameField.getText(),
                             passwordField.getText(),
                             Integer.parseInt(otpField.getText())
-                        )
+                        ),
+                        LOCAL_SERVER_ADDRESS,
+                        LOCAL_SERVER_PORT,
+                        LOCAL_SERVER_CERTIFICATE_NAME,
+                        LOCAL_SERVER_CERTIFICATE_PASSWORD
                     );
                     
                 }
@@ -92,11 +107,12 @@ public class LoginUI {
         title.setFont(Font.font(FONT, 40));
     }
     
-    private void sslSend(Object message) {
-        System.setProperty("javax.net.ssl.trustStore", "../../localServerCertificate");
+    private void sslSend(Object message, String address, int port, String certificate, String password) {
+        System.setProperty("javax.net.ssl.trustStore", certificate);
+        System.setProperty("javax.net.ssl.trustStorePassword", password);
         SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
 
-        try(SSLSocket s = (SSLSocket)sf.createSocket("localhost", 8080);
+        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
             ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
         ) {
             SSLSession session = ((SSLSocket)s).getSession();
