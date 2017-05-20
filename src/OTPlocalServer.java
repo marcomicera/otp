@@ -2,10 +2,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.net.ssl.*;
@@ -96,7 +96,7 @@ public class OTPlocalServer extends Application {
         }
     }
     
-    private void printCertificate(SSLSession session, Certificate[] certificate) {
+    /*private void printCertificate(SSLSession session, Certificate[] certificate) {
         for (int i = 0; i < certificate.length; i++)
             System.out.println(((X509Certificate)certificate[i]).getSubjectDN());
         System.out.println("Peer host is " + session.getPeerHost());
@@ -105,5 +105,5 @@ public class OTPlocalServer extends Application {
         System.out.println("ID is " + new BigInteger(session.getId()));
         System.out.println("Session created in " + session.getCreationTime());
         System.out.println("Session accessed in " + session.getLastAccessedTime());
-    }
+    }*/
 }
