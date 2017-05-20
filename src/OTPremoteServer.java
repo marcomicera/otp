@@ -34,16 +34,11 @@ public class OTPremoteServer extends Application {
     Encryptor encr;
     
     // Its own address
-    // private final static String ADDRESS = "localhost";
     private final static int    PORT = 8081;
     
     // Its own certificate
     private final static String CERTIFICATE_NAME = "../../remoteServerCertificate",
                                 CERTIFICATE_PASSWORD = "password";
-    
-    // Remote server address
-    private final static String LOCAL_SERVER_ADDRESS = "localhost";
-    private final static int    LOCAL_SERVER_PORT = 8080;
     
     // Remote server certificate
     private final static String LOCAL_SERVER_CERTIFICATE_NAME = "../../localServerCertificate",
