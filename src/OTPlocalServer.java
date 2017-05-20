@@ -30,37 +30,54 @@ public class OTPlocalServer extends Application {
         System.setProperty("javax.net.ssl.keyStore", CERTIFICATE_NAME);
         System.setProperty("javax.net.ssl.keyStorePassword", CERTIFICATE_PASSWORD);
         
-        SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-        try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(PORT)) {
+        // Imports remote server's certificate
+        System.setProperty("javax.net.ssl.trustStore", REMOTE_SERVER_CERTIFICATE_NAME);
+        System.setProperty("javax.net.ssl.trustStorePassword", REMOTE_SERVER_CERTIFICATE_PASSWORD);
+        
+        // Socket factories
+        SSLSocketFactory rsSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+        SSLServerSocketFactory cSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+        
+        try(// Socket for remoteServeer communication
+            SSLSocket rsSocket = (SSLSocket)rsSocketFactory.createSocket(REMOTE_SERVER_ADDRESS, REMOTE_SERVER_PORT);
+            // Socket for client communications
+            SSLServerSocket cServerSocket = (SSLServerSocket)cSocketFactory.createServerSocket(PORT);
+        ) {
             System.out.println("Local server started\n");
             while(true) {
-                SSLSocket s = (SSLSocket)ss.accept();
+                SSLSocket cSocket = (SSLSocket)cServerSocket.accept();
 
-                Thread t = new Thread() {
+                Thread clientThread = new Thread() {
                     public void run() {
-                        try(ObjectInputStream ois = new ObjectInputStream(s.getInputStream())) {
-                            SSLSession session = ((SSLSocket)s).getSession();
-                            
-                            // Receives user infos
-                            UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
+                        /**/System.out.println("Thread " + Thread.currentThread().getId());
+                        
+                        try(ObjectOutputStream cOos = new ObjectOutputStream(cSocket.getOutputStream());
+                            ObjectInputStream cOis = new ObjectInputStream(cSocket.getInputStream());
+                            ObjectOutputStream rsOos = new ObjectOutputStream(rsSocket.getOutputStream());
+                            ObjectInputStream rsOis = new ObjectInputStream(rsSocket.getInputStream());
+                        ) {
+                            // Receiving user infos
+                            UserInfos user = (UserInfos)cOis.readObject();
                             System.out.println("Received: " + user);
                             
-                            // Checking OTP
-                            // ...
-
                             // Sending data to the remote server
-                            sslSend(
-                                user,
-                                REMOTE_SERVER_ADDRESS,
-                                REMOTE_SERVER_PORT,
-                                REMOTE_SERVER_CERTIFICATE_NAME,
-                                REMOTE_SERVER_CERTIFICATE_PASSWORD
-                            );
+                            rsOos.writeObject(user);
                             
-                            /**/Thread.sleep(2500);
+                            // Receiving remote server response
+                            CounterResponse response = (CounterResponse)rsOis.readObject();
+                            System.out.println("Remote server replied with: " + response);
                             
-                            CounterResponse response = (CounterResponse)ois.readObject();
-                            
+                            if(response.getDongleCounter() == null || response.getDongleKey() == null) {
+                                cOos.writeInt(0);
+                                System.out.println(user.getUsername() + " has not logged successfully.");
+                            }
+                            else {
+                                // OTP checking
+                                // ...
+                                
+                                cOos.writeInt(1);
+                                System.out.println(user.getUsername() + " has not logged successfully.");
+                            }
                             System.out.print("\n");
                         } catch(Exception e) {
                             e.printStackTrace();
@@ -68,29 +85,11 @@ public class OTPlocalServer extends Application {
                     }
                 };
                         
-                t.start();
+                clientThread.start();
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
-    }
-    
-    private void sslSend(Object message, String address, int port, String certificate, String password) {
-        System.setProperty("javax.net.ssl.trustStore", certificate);
-        System.setProperty("javax.net.ssl.trustStorePassword", password);
-        SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
-
-        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
-            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
-        ) {
-            SSLSession session = ((SSLSocket)s).getSession();
-            Certificate[] cchain = session.getPeerCertificates();
-
-            oout.writeObject(message);
-        } catch(IOException e) {
-            e.printStackTrace(); 
-        }
-        System.out.println("\"" + message + "\" sent.");
     }
     
     private void printCertificate(SSLSession session, Certificate[] certificate) {
