@@ -20,7 +20,6 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
 /*  Algorithm: AES
         • Why it is better than DES
@@ -209,7 +208,7 @@ public class OTPremoteServer extends Application {
         insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108);
     }
     
-    private void printCertificate(SSLSession session, Certificate[] certificate) {
+    /*private void printCertificate(SSLSession session, Certificate[] certificate) {
         for (int i = 0; i < certificate.length; i++)
             System.out.println(((X509Certificate)certificate[i]).getSubjectDN());
         System.out.println("Peer host is " + session.getPeerHost());
@@ -218,5 +217,5 @@ public class OTPremoteServer extends Application {
         System.out.println("ID is " + new BigInteger(session.getId()));
         System.out.println("Session created in " + session.getCreationTime());
         System.out.println("Session accessed in " + session.getLastAccessedTime());
-    }
+    }*/
 }
