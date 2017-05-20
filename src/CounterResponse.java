@@ -13,4 +13,7 @@ public class CounterResponse implements Serializable {
     public String toString() {
         return "[counter: " + dongle_counter + " | key: " + dongle_key + "]";
     }
+    
+    public Long getDongleCounter() { return dongle_counter; }
+    public String getDongleKey() { return dongle_key; }
 }
