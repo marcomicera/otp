@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.net.SocketException;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -53,32 +54,34 @@ public class OTPremoteServer extends Application {
         System.setProperty("javax.net.ssl.keyStore", CERTIFICATE_NAME);
         System.setProperty("javax.net.ssl.keyStorePassword", CERTIFICATE_PASSWORD);
         
-        SSLServerSocketFactory sf = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+        SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
-        try(SSLServerSocket ss = (SSLServerSocket)sf.createServerSocket(PORT)) {
+        try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
             while(true) {
-                SSLSocket s = (SSLSocket)ss.accept();
+                SSLSocket lsSocket = (SSLSocket)lsServerSocket.accept();
 
                 Thread t = new Thread() {
                     public void run() {
-                        try(ObjectInputStream ois = new ObjectInputStream(s.getInputStream())) {
-                            SSLSession session = ((SSLSocket)s).getSession();
-                            
+                        try(ObjectOutputStream lsOos = new ObjectOutputStream(lsSocket.getOutputStream());
+                            ObjectInputStream lsOis = new ObjectInputStream(lsSocket.getInputStream());
+                        ) {
                             // Receives user infos
-                            UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
+                            UserInfos user = (UserInfos)lsOis.readObject();
                             System.out.println("Received: " + user);
                             
-                            sslSend(
-                                loginCheck(user.getUsername(), user.getPassword()),
-                                LOCAL_SERVER_ADDRESS,
-                                LOCAL_SERVER_PORT,
-                                LOCAL_SERVER_CERTIFICATE_NAME,
-                                LOCAL_SERVER_CERTIFICATE_PASSWORD
-                            );
-                        } catch(Exception e) {
-                            e.printStackTrace();
+                            // Sends reply
+                            // System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
+                            // System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
+                            lsOos.writeObject(loginCheck(user.getUsername(), user.getPassword()));
+                        } catch(SocketException se) {
+                            if(se.getLocalizedMessage().compareTo("Connection reset") == 0)
+                                System.out.println("Local server disconnected");
+                            else
+                                Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, se);
+                        } catch(IOException | ClassNotFoundException ex) {
+                            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 };
@@ -87,6 +90,7 @@ public class OTPremoteServer extends Application {
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
+            
         }
     }
     
@@ -123,9 +127,7 @@ public class OTPremoteServer extends Application {
             Statement st = co.createStatement();
         ) {
             query = "SELECT * FROM users WHERE username = \"" + username + "\"";
-        
             ResultSet rs = st.executeQuery(query);
-            
             rs.next();
             
             String decryptedPassword = new String(encr.decrypt(rs.getString("password")));
@@ -153,24 +155,6 @@ public class OTPremoteServer extends Application {
         }
         
         return new CounterResponse(null, null);
-    }
-    
-    private void sslSend(Object message, String address, int port, String certificate, String password) {
-        System.setProperty("javax.net.ssl.trustStore", certificate);
-        System.setProperty("javax.net.ssl.trustStorePassword", password);
-        SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
-
-        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
-            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
-        ) {
-            SSLSession session = ((SSLSocket)s).getSession();
-            Certificate[] cchain = session.getPeerCertificates();
-
-            oout.writeObject(message);
-        } catch(IOException e) {
-            e.printStackTrace(); 
-        }
-        System.out.println("\"" + message + "\" sent.");
     }
     
     // Test
