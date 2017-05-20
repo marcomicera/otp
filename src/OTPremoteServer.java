@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
@@ -18,6 +19,7 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 /*  Algorithm: AES
         • Why it is better than DES
@@ -68,7 +70,13 @@ public class OTPremoteServer extends Application {
                             UserInfos user = (UserInfos)ois.readObject(); // Netbeans gives error, but the class file is included in the classpath
                             System.out.println("Received: " + user);
                             
-                            loginCheck(user.getUsername(), user.getPassword());
+                            sslSend(
+                                loginCheck(user.getUsername(), user.getPassword()),
+                                LOCAL_SERVER_ADDRESS,
+                                LOCAL_SERVER_PORT,
+                                LOCAL_SERVER_CERTIFICATE_NAME,
+                                LOCAL_SERVER_CERTIFICATE_PASSWORD
+                            );
                         } catch(Exception e) {
                             e.printStackTrace();
                         }
@@ -104,7 +112,7 @@ public class OTPremoteServer extends Application {
         }
     }
 
-    public void loginCheck(String username, String password) {
+    public CounterResponse loginCheck(String username, String password) {
         String query = "";
         
         try(// SSL not used in the bank
@@ -122,20 +130,47 @@ public class OTPremoteServer extends Application {
             
             String decryptedPassword = new String(encr.decrypt(rs.getString("password")));
             
-            if(decryptedPassword.compareTo(password) == 0)
+            if(decryptedPassword.compareTo(password) == 0) {
                 System.out.println(username + " logged successfully.\n" +
                     "His/her password: " + password + "\n"
                 );
-            else
+                return new CounterResponse(
+                    encr.bytesToLong(encr.decrypt(rs.getString("dongle_counter"))),
+                    new String(encr.decrypt(rs.getString("dongle_key")))
+                );
+            }
+            else {
                 System.out.println(username + ": password do not match.\n" +
                     "His/her actual password: " + decryptedPassword +
                     "\nGuessed password: " + password + "\n"
                 );
+                return new CounterResponse(null, null);
+            }
         } catch(SQLException e) {
             System.err.println(e.getMessage());
         } catch(GeneralSecurityException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return new CounterResponse(null, null);
+    }
+    
+    private void sslSend(Object message, String address, int port, String certificate, String password) {
+        System.setProperty("javax.net.ssl.trustStore", certificate);
+        System.setProperty("javax.net.ssl.trustStorePassword", password);
+        SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
+
+        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
+            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
+        ) {
+            SSLSession session = ((SSLSocket)s).getSession();
+            Certificate[] cchain = session.getPeerCertificates();
+
+            oout.writeObject(message);
+        } catch(IOException e) {
+            e.printStackTrace(); 
+        }
+        System.out.println("\"" + message + "\" sent.");
     }
     
     // Test
