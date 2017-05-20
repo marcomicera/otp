@@ -57,6 +57,10 @@ public class OTPlocalServer extends Application {
                                 REMOTE_SERVER_CERTIFICATE_PASSWORD
                             );
                             
+                            /**/Thread.sleep(2500);
+                            
+                            CounterResponse response = (CounterResponse)ois.readObject();
+                            
                             System.out.print("\n");
                         } catch(Exception e) {
                             e.printStackTrace();
