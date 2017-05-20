@@ -6,11 +6,12 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.*;
 
 public class OTPlocalServer extends Application {
     // Its own address
-    // private final static String ADDRESS = "localhost";
     private final static int    PORT = 8080;
     
     // Its own certificate
@@ -52,10 +53,11 @@ public class OTPlocalServer extends Application {
                         /**/System.out.println("Thread " + Thread.currentThread().getId());
                         
                         try(ObjectOutputStream cOos = new ObjectOutputStream(cSocket.getOutputStream());
-                            ObjectInputStream cOis = new ObjectInputStream(cSocket.getInputStream());
                             ObjectOutputStream rsOos = new ObjectOutputStream(rsSocket.getOutputStream());
-                            ObjectInputStream rsOis = new ObjectInputStream(rsSocket.getInputStream());
                         ) {
+                            ObjectInputStream cOis = new ObjectInputStream(cSocket.getInputStream());
+                            ObjectInputStream rsOis = new ObjectInputStream(rsSocket.getInputStream());
+                            
                             // Receiving user infos
                             UserInfos user = (UserInfos)cOis.readObject();
                             System.out.println("Received: " + user);
@@ -65,8 +67,8 @@ public class OTPlocalServer extends Application {
                             
                             // Receiving remote server response
                             CounterResponse response = (CounterResponse)rsOis.readObject();
-                            System.out.println("Remote server replied with: " + response);
                             
+                            // Sending response
                             if(response.getDongleCounter() == null || response.getDongleKey() == null) {
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
@@ -76,19 +78,21 @@ public class OTPlocalServer extends Application {
                                 // ...
                                 
                                 cOos.writeInt(1);
-                                System.out.println(user.getUsername() + " has not logged successfully.");
+                                System.out.println(user.getUsername() + " has logged successfully.");
                             }
                             System.out.print("\n");
-                        } catch(Exception e) {
-                            e.printStackTrace();
+                        } catch(IOException ex) {
+                            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch(ClassNotFoundException ex) {
+                            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 };
                         
                 clientThread.start();
             }
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
