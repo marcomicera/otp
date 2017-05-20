@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.cert.Certificate;
@@ -84,18 +85,26 @@ public class LoginUI {
                         otpField.getText()
                     )
                 ) {
-                    sslSend(
-                        new UserInfos(
+                    // Imports local server's certificate
+                    System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
+                    System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
+                    
+                    SSLSocketFactory lsSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+                    try(SSLSocket lsSocket = (SSLSocket)lsSocketFactory.createSocket(LOCAL_SERVER_ADDRESS, LOCAL_SERVER_PORT);
+                        ObjectOutputStream lsOos = new ObjectOutputStream(lsSocket.getOutputStream());
+                        ObjectInputStream lsOis = new ObjectInputStream(lsSocket.getInputStream());
+                    ) {
+                        UserInfos infos = new UserInfos(
                             usernameField.getText(),
                             passwordField.getText(),
                             Integer.parseInt(otpField.getText())
-                        ),
-                        LOCAL_SERVER_ADDRESS,
-                        LOCAL_SERVER_PORT,
-                        LOCAL_SERVER_CERTIFICATE_NAME,
-                        LOCAL_SERVER_CERTIFICATE_PASSWORD
-                    );
-                    
+                        );
+                        
+                        lsOos.writeObject(infos);
+                        System.out.println("\"" + infos + "\" sent.");
+                    } catch(IOException e) {
+                        e.printStackTrace(); 
+                    }
                 }
             }
         );
@@ -105,24 +114,6 @@ public class LoginUI {
     
     private void setStyle() {
         title.setFont(Font.font(FONT, 40));
-    }
-    
-    private void sslSend(Object message, String address, int port, String certificate, String password) {
-        System.setProperty("javax.net.ssl.trustStore", certificate);
-        System.setProperty("javax.net.ssl.trustStorePassword", password);
-        SSLSocketFactory sf = (SSLSocketFactory)SSLSocketFactory.getDefault();
-
-        try(SSLSocket s = (SSLSocket)sf.createSocket(address, port);
-            ObjectOutputStream oout = new ObjectOutputStream(s.getOutputStream());
-        ) {
-            SSLSession session = ((SSLSocket)s).getSession();
-            Certificate[] cchain = session.getPeerCertificates();
-
-            oout.writeObject(message);
-        } catch(IOException e) {
-            e.printStackTrace(); 
-        }
-        System.out.println("\"" + message + "\" sent.");
     }
     
     public VBox getWrapper() { return wrapper; }
