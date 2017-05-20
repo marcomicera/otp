@@ -94,14 +94,21 @@ public class LoginUI {
                         ObjectOutputStream lsOos = new ObjectOutputStream(lsSocket.getOutputStream());
                         ObjectInputStream lsOis = new ObjectInputStream(lsSocket.getInputStream());
                     ) {
+                        // Sends user infos
                         UserInfos infos = new UserInfos(
                             usernameField.getText(),
                             passwordField.getText(),
                             Integer.parseInt(otpField.getText())
                         );
-                        
                         lsOos.writeObject(infos);
                         System.out.println("\"" + infos + "\" sent.");
+                        
+                        // Receives a reply
+                        int reply = lsOis.readInt();
+                        if(reply == 1)
+                            System.out.println("Logged in successfully");
+                        else
+                            System.out.println("Login error: please try again.");
                     } catch(IOException e) {
                         e.printStackTrace(); 
                     }
