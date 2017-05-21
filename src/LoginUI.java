@@ -106,9 +106,9 @@ public class LoginUI {
                         // Receives a reply
                         int reply = lsOis.readInt();
                         if(reply == 1)
-                            System.out.println("Logged in successfully");
+                            System.out.println("Logged in successfully.\n");
                         else
-                            System.out.println("Login error: please try again.");
+                            System.out.println("Login error: please try again.\n");
                     } catch(IOException e) {
                         e.printStackTrace(); 
                     }
