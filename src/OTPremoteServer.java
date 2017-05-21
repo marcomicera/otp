@@ -84,7 +84,6 @@ public class OTPremoteServer extends Application {
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
-            
         }
     }
     
@@ -143,7 +142,7 @@ public class OTPremoteServer extends Application {
                 return new CounterResponse(null, null);
             }
         } catch(SQLException e) {
-            System.err.println(e.getMessage());
+            System.err.println(e.getMessage() + "\n");
         } catch(GeneralSecurityException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
