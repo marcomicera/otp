@@ -39,9 +39,7 @@ public class OTPlocalServer extends Application {
         SSLSocketFactory rsSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
         SSLServerSocketFactory cSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         
-        try(// Socket for remoteServeer communication
-            SSLSocket rsSocket = (SSLSocket)rsSocketFactory.createSocket(REMOTE_SERVER_ADDRESS, REMOTE_SERVER_PORT);
-            // Socket for client communications
+        try(// Socket for client communications
             SSLServerSocket cServerSocket = (SSLServerSocket)cSocketFactory.createServerSocket(PORT);
         ) {
             System.out.println("Local server started\n");
@@ -52,7 +50,9 @@ public class OTPlocalServer extends Application {
                     public void run() {
                         /**/System.out.println("Thread " + Thread.currentThread().getId());
                         
-                        try(ObjectOutputStream cOos = new ObjectOutputStream(cSocket.getOutputStream());
+                        try(// Socket for remoteServer communication
+                            SSLSocket rsSocket = (SSLSocket)rsSocketFactory.createSocket(REMOTE_SERVER_ADDRESS, REMOTE_SERVER_PORT);
+                            ObjectOutputStream cOos = new ObjectOutputStream(cSocket.getOutputStream());
                             ObjectOutputStream rsOos = new ObjectOutputStream(rsSocket.getOutputStream());
                         ) {
                             ObjectInputStream cOis = new ObjectInputStream(cSocket.getInputStream());
