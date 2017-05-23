@@ -69,50 +69,8 @@ public class LoginUI {
         
         signInButton.setOnAction(
             (ActionEvent ae) -> {
-                // Checking user inputs (regexp by: https://goo.gl/QPOQVR)
-                if( Pattern.matches(
-                        "^(?=.{" + USERNAME_MINIMUM_LENGTH + "," + USERNAME_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
-                        usernameField.getText()
-                    )
-                    &&
-                    Pattern.matches(
-                        "^(?=.{" + PASSWORD_MINIMUM_LENGTH + "," + PASSWORD_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", 
-                        passwordField.getText()
-                    )
-                    &&
-                    Pattern.matches(
-                        "\\d{" + OTP_LENGTH + "}", 
-                        otpField.getText()
-                    )
-                ) {
-                    // Imports local server's certificate
-                    System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
-                    System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
-                    
-                    SSLSocketFactory lsSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
-                    try(SSLSocket lsSocket = (SSLSocket)lsSocketFactory.createSocket(LOCAL_SERVER_ADDRESS, LOCAL_SERVER_PORT);
-                        ObjectOutputStream lsOos = new ObjectOutputStream(lsSocket.getOutputStream());
-                        ObjectInputStream lsOis = new ObjectInputStream(lsSocket.getInputStream());
-                    ) {
-                        // Sends user infos
-                        UserInfos infos = new UserInfos(
-                            usernameField.getText(),
-                            passwordField.getText(),
-                            Integer.parseInt(otpField.getText())
-                        );
-                        lsOos.writeObject(infos);
-                        System.out.println("\"" + infos + "\" sent.");
-                        
-                        // Receives a reply
-                        int reply = lsOis.readInt();
-                        if(reply == 1)
-                            System.out.println("Logged in successfully.\n");
-                        else
-                            System.out.println("Login error: please try again.\n");
-                    } catch(IOException e) {
-                        e.printStackTrace(); 
-                    }
-                }
+                if(validInputs()) // Checking user inputs 
+                    sendUserInfos();
             }
         );
 
@@ -121,6 +79,54 @@ public class LoginUI {
     
     private void setStyle() {
         title.setFont(Font.font(FONT, 40));
+    }
+    
+    private boolean validInputs() {
+        // Regexp by: https://goo.gl/QPOQVR
+        return  Pattern.matches(
+                    "^(?=.{" + USERNAME_MINIMUM_LENGTH + "," + USERNAME_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+                    usernameField.getText()
+                )
+                &&
+                Pattern.matches(
+                    "^(?=.{" + PASSWORD_MINIMUM_LENGTH + "," + PASSWORD_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", 
+                    passwordField.getText()
+                )
+                &&
+                Pattern.matches(
+                    "\\d{" + OTP_LENGTH + "}", 
+                    otpField.getText()
+                );
+    }
+    
+    private void sendUserInfos() {
+        // Imports local server's certificate
+        System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
+        System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
+
+        SSLSocketFactory lsSocketFactory = (SSLSocketFactory)SSLSocketFactory.getDefault();
+        try(SSLSocket lsSocket = (SSLSocket)lsSocketFactory.createSocket(LOCAL_SERVER_ADDRESS, LOCAL_SERVER_PORT);
+            ObjectOutputStream lsOos = new ObjectOutputStream(lsSocket.getOutputStream());
+            ObjectInputStream lsOis = new ObjectInputStream(lsSocket.getInputStream());
+        ) {
+            // Sends user infos
+            UserInfos infos = new UserInfos(
+                usernameField.getText(),
+                passwordField.getText(),
+                Integer.parseInt(otpField.getText())
+            );
+            lsOos.writeObject(infos);
+            System.out.println("\"" + infos + "\" sent.");
+
+            // Receives a reply
+            int reply = lsOis.readInt();
+            if(reply == 1)
+                System.out.println("Logged in successfully.\n");
+            else
+                System.out.println("Login error: please try again.\n");
+        } catch(IOException e) {
+            e.printStackTrace(); 
+        }
     }
     
     public VBox getWrapper() { return wrapper; }
