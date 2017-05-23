@@ -69,7 +69,7 @@ public class OTPlocalServer extends Application {
                             CounterResponse response = (CounterResponse)rsOis.readObject();
                             
                             // Sending response
-                            if(response.getDongleCounter() == null || response.getDongleKey() == null) {
+                            if(!validCounterResponse(response)) {
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
@@ -94,6 +94,10 @@ public class OTPlocalServer extends Application {
         } catch (IOException ex) {
             Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private boolean validCounterResponse(CounterResponse response) {
+        return response.getDongleCounter() != null && response.getDongleKey() != null;
     }
     
     /*private void printCertificate(SSLSession session, Certificate[] certificate) {
