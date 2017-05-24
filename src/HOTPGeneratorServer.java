@@ -156,7 +156,6 @@ public class HOTPGeneratorServer {
         String[] HOTPWindow = new String[WINDOW + 1];
         for (int i = 0; i < WINDOW + 1; i++) {
             long set = (dongle_counter - (WINDOW / 2) + i);
-            System.out.println("SONO DENTRO AL FOR STAMPO: " + set +  "");
             HOTPWindow[i] = HOTPGen(set, dongle_key);
             if(Integer.parseInt(HOTPWindow[i]) == user_otp )
             {
