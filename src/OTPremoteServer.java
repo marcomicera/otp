@@ -51,6 +51,8 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
+        //inserts();
+        
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
             while(true) {
@@ -87,8 +89,8 @@ public class OTPremoteServer extends Application {
         }
     }
     
-    public void insertUser(String username, String password, byte[] key, long counter) {
-        String query = "INSERT INTO users VALUES (?, ?, ?, ?);";
+    public void insertUser(String username, String password, byte[] key, long counter, boolean lw) {
+        String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?);";
         byte[] counterBytes = encr.longToBytes(counter); 
 
         try(// SSL not used in the bank
@@ -102,6 +104,10 @@ public class OTPremoteServer extends Application {
             ps.setString(2, new String(encr.encrypt(password)));
             ps.setString(3, new String(encr.encrypt(key)));
             ps.setString(4, new String(encr.encrypt(counter)));
+            
+            // 0 viene sempre criptato nello stesso modo
+            // usare AES in CBC mode con IV
+            ps.setString(5, new String(encr.encrypt(lw)));
 
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException e) {
@@ -129,9 +135,11 @@ public class OTPremoteServer extends Application {
                 System.out.println(username + " logged successfully.\n" +
                     "His/her password: " + password + "\n"
                 );
+                
                 return new CounterResponse(
                     encr.bytesToLong(encr.decrypt(rs.getString("dongle_counter"))),
-                    new String(encr.decrypt(rs.getString("dongle_key")))
+                    new String(encr.decrypt(rs.getString("dongle_key"))),
+                    (int)encr.decrypt(rs.getString("large_window_on"))[0] != 0
                 );
             }
             else {
@@ -196,15 +204,15 @@ public class OTPremoteServer extends Application {
     
     // Inserts
     private void inserts() {
-        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182);
-        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641);
-        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121);
-        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17);
-        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae".getBytes(), 45);
-        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611);
-        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141);
-        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212);
-        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108);
+        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182, false);
+        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641, false);
+        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121, false);
+        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17, false);
+        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae".getBytes(), 45, false);
+        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611, false);
+        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141, false);
+        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212, false);
+        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false);
     }
     
     /*private void printCertificate(SSLSession session, Certificate[] certificate) {

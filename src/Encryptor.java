@@ -82,6 +82,10 @@ public class Encryptor {
     public byte[] encrypt(int plainText) throws GeneralSecurityException  {
         return encrypt(ByteBuffer.allocate(4).putInt(plainText).array());
     }
+    
+    public byte[] encrypt(boolean plainText) throws GeneralSecurityException  {
+        return encrypt((plainText) ? 1 : 0);
+    }
 
     public byte[] encrypt(long plainText) throws GeneralSecurityException  {
         return encrypt(longToBytes(plainText));
