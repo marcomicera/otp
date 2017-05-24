@@ -89,32 +89,6 @@ public class OTPremoteServer extends Application {
         }
     }
     
-    public void insertUser(String username, String password, byte[] key, long counter, boolean lw) {
-        String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?);";
-        byte[] counterBytes = encr.longToBytes(counter); 
-
-        try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
-            Connection co = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
-            );
-            PreparedStatement ps = co.prepareStatement(query);
-        ) {
-            ps.setString(1, username);
-            ps.setString(2, new String(encr.encrypt(password)));
-            ps.setString(3, new String(encr.encrypt(key)));
-            ps.setString(4, new String(encr.encrypt(counter)));
-            
-            // 0 viene sempre criptato nello stesso modo
-            // usare AES in CBC mode con IV
-            ps.setString(5, new String(encr.encrypt(lw)));
-
-            ps.executeUpdate();
-        } catch(SQLException | GeneralSecurityException e) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
-        }
-    }
-
     public CounterResponse loginCheck(String username, String password) {
         String query = "";
         
@@ -156,6 +130,56 @@ public class OTPremoteServer extends Application {
         }
         
         return new CounterResponse(null, null);
+    }
+    
+    public void insertUser(String username, String password, byte[] key, long counter, boolean lw) {
+        String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?);";
+        byte[] counterBytes = encr.longToBytes(counter); 
+
+        try(// SSL not used in the bank
+            // trovare un modo per far connettere solo questa applicazione al database
+            Connection co = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
+            );
+            PreparedStatement ps = co.prepareStatement(query);
+        ) {
+            ps.setString(1, username);
+            ps.setString(2, new String(encr.encrypt(password)));
+            ps.setString(3, new String(encr.encrypt(key)));
+            ps.setString(4, new String(encr.encrypt(counter)));
+            
+            // 0 viene sempre criptato nello stesso modo
+            // usare AES in CBC mode con IV
+            ps.setString(5, new String(encr.encrypt(lw)));
+
+            ps.executeUpdate();
+        } catch(SQLException | GeneralSecurityException e) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+    
+    public void updateCounter(String username, long new_value) {
+        String query = "INSERT INTO portafoglio VALUES " + new String(new char[voci.size()]).replace("\0", "(?, ?, ?, ?),"); // 44)
+        query = query.substring(0, query.length() - 1); // 45)
+            
+            try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/portafoglio?user=root&password="); // 05)
+                PreparedStatement ps = co.prepareStatement(query); // 06)
+            ) {
+                int i = 1; // 46)
+                for(Voce v: voci) {
+                    ps.setInt(i++, v.getId()); // 09)
+                    ps.setString(i++, v.getNome()); // 09)
+                    ps.setDouble(i++, v.getImporto()); // 09)
+                    ps.setDate(i++, v.getData()); // 09)
+                }
+                ps.executeUpdate(); // 47)
+            } catch(SQLException e) {
+                System.err.println(e.getMessage());
+            }
+    }
+    
+    public void updateLargeWindow(String username, boolean new_value) {
+        
     }
     
     // Test
