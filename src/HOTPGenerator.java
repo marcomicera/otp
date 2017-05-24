@@ -151,12 +151,12 @@ public class HOTPGenerator {
         int digits = addChecksum ? (codeDigits + 1) : codeDigits;
         byte[] text = new byte[8];
         for (int i = text.length - 1; i >= 0; i--) {
-            text[i] = (byte) (movingFactor & 0xff);
+            text[i] = (byte) (movingFactor & 0xff); // movingFactor è il counter
             movingFactor >>= 8;
         }
 
         // compute hmac hash
-        byte[] hash = hmac_sha1(secret, text);
+        byte[] hash = hmac_sha1(secret, text);// secret è la dongle key
 
         // put selected bytes into result int
         int offset = hash[hash.length - 1] & 0xf;

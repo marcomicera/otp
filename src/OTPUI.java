@@ -57,7 +57,8 @@ public class OTPUI {
                     String HOTPString ="";
                     try {
                         HOTPGenerator htopgen = new HOTPGenerator(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
-                        byte[] secret = HOTPGenerator.hexStringToByteArray("14FEA54A019BC73A");
+                        //byte[] secret = HOTPGenerator.hexStringToByteArray("14FEA54A019BC73A14FEA54A019BC73A"); //Giustificare perché la dongle key è 16 byte
+                        byte[] secret = "L#w3aWò8]ì?ì1kdF".getBytes(); // L#w3aWÃ²8]Ã¬?Ã¬1kdF
                         long movingFactor;
                         movingFactor = HOTPGenerator.getCounter();
                         System.out.println("Valore counter: " + movingFactor);
