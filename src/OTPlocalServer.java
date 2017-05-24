@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import javafx.application.Application;
@@ -76,7 +78,8 @@ public class OTPlocalServer extends Application {
                             else {
                                 // OTP checking
                                 // ...
-                                
+                                String HOTPSERVER = HOTPCheck(response.getDongleCounter(), response.getDongleKey());
+                                System.out.println(HOTPSERVER);
                                 cOos.writeInt(1);
                                 System.out.println(user.getUsername() + " has logged successfully.");
                             }
@@ -110,4 +113,29 @@ public class OTPlocalServer extends Application {
         System.out.println("Session created in " + session.getCreationTime());
         System.out.println("Session accessed in " + session.getLastAccessedTime());
     }*/
+    public static String HOTPCheck(long dongle_counter, String dongle_key) {
+        String HOTPString = "";
+        try {
+            HOTPGeneratorServer htopgen = new HOTPGeneratorServer(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
+            System.out.println("La dongle_key è: " + dongle_key);
+            byte[] secret = dongle_key.getBytes();//("14FEA54A019BC73A14FEA54A019BC73A"); //Giustificare perché la dongle key è 16 byte
+            long movingFactor;
+            movingFactor = dongle_counter;//HOTPGeneratorServer.getCounter();
+            System.out.println("Valore counter: " + movingFactor);
+            int codeDigits = 6;
+            boolean addChecksum = false;
+            int truncationOffset = 0;
+            HOTPString = HOTPGeneratorServer.generateOTP(secret, movingFactor, codeDigits, addChecksum, truncationOffset);
+            System.out.println("Codice otp generato: " + HOTPString);
+            System.out.println("Movingfactor counter: " + movingFactor);
+            HOTPGeneratorServer.updateCounter(movingFactor + 1);
+        } catch (IOException ex) {
+            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return HOTPString;
+    }
 }
