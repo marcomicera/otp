@@ -69,6 +69,7 @@ public class OTPlocalServer extends Application {
                             
                             // Receiving remote server response
                             CounterResponse response = (CounterResponse)rsOis.readObject();
+                            System.out.println(user.getUsername() + "'s large_window_on value: " + response.getLargeWindowOn());
                             
                             // Sending response
                             if(!validCounterResponse(response)) {
