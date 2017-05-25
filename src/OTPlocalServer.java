@@ -77,16 +77,26 @@ public class OTPlocalServer extends Application {
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
                             else {
-                                // OTP checking
-                                // ...
-                                //user.otp password
-                                if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey())) {
-                                    cOos.writeInt(1);
-                                    System.out.println(user.getUsername() + " has logged successfully.");
-                                } else {
-                                    cOos.writeInt(0);
-                                    System.out.println(user.getUsername() + " has not logged successfully.");
+                                if(!response.getLargeWindowOn()){
+                                     if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false)) {
+                                         //MANDO AGGIORNAMETO AL REMOTE SERVER CON COUNTER RICEVUTO + 1
+                                         cOos.writeInt(1);                                                                    
+                                         System.out.println(user.getUsername() + " has logged successfully.");
+                                     }
+                                     else{
+                                          if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
+                                              //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW
+                                          }
+                                           cOos.writeInt(0);
+                                           System.out.println(user.getUsername() + " has not logged successfully.");
+                                     }
+                                } 
+                                else{
+                                     if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
+                                         
+                                     }
                                 }
+
                             }
                             System.out.print("\n");
                         } catch(IOException ex) {
