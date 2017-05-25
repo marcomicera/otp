@@ -88,6 +88,8 @@ public class OTPremoteServer extends Application {
                                 // what operations it needs to perform on database
                                 CounterResponse response = (CounterResponse)lsOis.readObject();
                                 
+                                
+                                
                                 // User's OTP is in large window
                                 if(response.getLargeWindowOn()) {
                                     // User's OTP is different from the previous one
