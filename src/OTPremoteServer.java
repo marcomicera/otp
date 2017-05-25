@@ -85,6 +85,7 @@ public class OTPremoteServer extends Application {
                             if(reply.getDongleCounter() == null || reply.getDongleKey() == null) {
                                 // Thread terminates
                             }
+                            // Login successful
                             else {
                                 // User's OTP is in large window
                                 if(response.getLargeWindowOn()) {
