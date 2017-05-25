@@ -73,15 +73,6 @@ public class OTPlocalServer extends Application {
 
                             // Username or password incorrect
                             if(!validCounterResponse(response)) {
-                                /*rsOos.writeObject(
-                                    new CounterResponse(
-                                        null,   // dongle_counter
-                                        null,   // dongle_key
-                                        null,   // large_window_on
-                                        null    // large_window_otp
-                                    )
-                                );*/
-                                
                                 // Login unsuccessful
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
@@ -145,7 +136,7 @@ public class OTPlocalServer extends Application {
                                     }
                                 }
                                 // User is in large window mode                    
-                                else{
+                                else {
                                     align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true);
                                         
                                     // User's OTP in large window and different from the previous one
