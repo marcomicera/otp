@@ -86,7 +86,6 @@ public class OTPlocalServer extends Application {
                                 } else {
                                     cOos.writeInt(0);
                                     System.out.println(user.getUsername() + " has not logged successfully.");
-
                                 }
                             }
                             System.out.print("\n");
