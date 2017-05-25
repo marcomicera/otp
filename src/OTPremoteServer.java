@@ -234,7 +234,25 @@ public class OTPremoteServer extends Application {
     public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) {
         String query =
             "UPDATE users SET large_window_on = ? " + 
-            ((new_lw_value) ? ", large_window_otp = ? " : "") +
+            ((new_lw_value) ? ", large_window_otp = ?;\"\n" +
+"        ;\n" +
+"\n" +
+"        try(// SSL not used in the bank\n" +
+"            // trovare un modo per far connettere solo questa applicazione al database\n" +
+"            Connection co = DriverManager.getConnection(\n" +
+"                \"jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false\"\n" +
+"            );\n" +
+"            PreparedStatement ps = co.prepareStatement(query);\n" +
+"        ) {\n" +
+"            int i = 1;\n" +
+"            ps.setString(i++, new String(encr.encrypt(new_lw_value)));\n" +
+"            if(new_lw_value)\n" +
+"                ps.setString(i++, new String(encr.encrypt(lw_otp)));\n" +
+"            else\n" +
+"                ps.setNull(i++, Types.VARCHAR);\n" +
+"            ps.setString(i, username);\n" +
+"            \n" +
+"? " : "") +
             "WHERE username = ?;"
         ;
 
