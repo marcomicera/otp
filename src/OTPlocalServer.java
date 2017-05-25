@@ -73,6 +73,15 @@ public class OTPlocalServer extends Application {
 
                             // Username or password incorrect
                             if(!validCounterResponse(response)) {
+                                /*rsOos.writeObject(
+                                    new CounterResponse(
+                                        null,   // dongle_counter
+                                        null,   // dongle_key
+                                        null,   // large_window_on
+                                        null    // large_window_otp
+                                    )
+                                );*/
+                                
                                 // Login unsuccessful
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
@@ -92,7 +101,7 @@ public class OTPlocalServer extends Application {
                                             new CounterResponse(
                                                 align_counter,  // dongle_counter
                                                 null,           // dongle_key
-                                                null,           // large_window_on
+                                                false,           // large_window_on
                                                 null            // large_window_otp
                                             )
                                         );
@@ -114,6 +123,18 @@ public class OTPlocalServer extends Application {
                                                     null,           // dongle_key
                                                     true,           // large_window_on
                                                     align_counter   // large_window_otp
+                                                )
+                                            );
+                                        }
+                                        // User's OTP is not in large window
+                                        else {
+                                            // Tells remoteServer to do nothing
+                                            rsOos.writeObject(
+                                                new CounterResponse(
+                                                    null,           // dongle_counter
+                                                    null,           // dongle_key
+                                                    false,           // large_window_on
+                                                    null   // large_window_otp
                                                 )
                                             );
                                         }
