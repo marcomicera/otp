@@ -113,7 +113,7 @@ public class LoginUI {
             UserInfos infos = new UserInfos(
                 usernameField.getText(),
                 passwordField.getText(),
-                Integer.parseInt(otpField.getText())
+                otpField.getText()
             );
             lsOos.writeObject(infos);
             System.out.println("\"" + infos + "\" sent.");
