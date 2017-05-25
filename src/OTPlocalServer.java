@@ -85,7 +85,7 @@ public class OTPlocalServer extends Application {
                                      }
                                      else{
                                           if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
-                                              //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW
+                                              //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW + CODICE OTP
                                           }
                                            cOos.writeInt(0);
                                            System.out.println(user.getUsername() + " has not logged successfully.");
@@ -93,7 +93,17 @@ public class OTPlocalServer extends Application {
                                 } 
                                 else{
                                      if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
-                                         
+                                         if(response.getLargeWindowOtp().compareTo(user.getOtp()) != 0 ){
+                                             //UPDATE USER COUNTER DB + DEATTIVO LA FINESTRA LARGA
+                                             cOos.writeInt(1);                                                                    
+                                             System.out.println(user.getUsername() + " has logged successfully.");
+                                         }
+                                         else{
+                                             //DEATTIVO FINESTRA LARGA
+                                             cOos.writeInt(0);
+                                             System.out.println(user.getUsername() + " has not logged successfully.");
+                                    
+                                         }
                                      }
                                 }
 
