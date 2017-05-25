@@ -78,15 +78,16 @@ public class OTPremoteServer extends Application {
                             );
                             lsOos.writeObject(reply);
                             
-                            // Reads localServer response
-                            CounterResponse response = (CounterResponse)lsOis.readObject();
-                            
                             // Login unsuccessful
                             if(reply.getDongleCounter() == null || reply.getDongleKey() == null) {
                                 // Thread terminates
                             }
                             // Login successful
                             else {
+                                // Reads localServer response in order to understand
+                                // what operations it needs to perform on database
+                                CounterResponse response = (CounterResponse)lsOis.readObject();
+                                
                                 // User's OTP is in large window
                                 if(response.getLargeWindowOn()) {
                                     // User's OTP is different from the previous one
