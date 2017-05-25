@@ -151,30 +151,16 @@ public class HOTPGeneratorServer {
     //****************************************************************************************************************************
 
 
-    public static boolean HOTPCheck(int user_otp, long dongle_counter, String dongle_key) {
+    public static long HOTPCheck(int user_otp, long dongle_counter, String dongle_key) {
         System.out.println("Valori della finestra: ");
         String[] HOTPWindow = new String[WINDOW + 1];
         for (int i = 0; i < WINDOW + 1; i++) {
             long set = (dongle_counter - (WINDOW / 2) + i);
             HOTPWindow[i] = HOTPGen(set, dongle_key);
             if(Integer.parseInt(HOTPWindow[i]) == user_otp )
-            {
-                if(i != (WINDOW / 2) ){ //Questo significa che client e server sono perfettamente allineati, altrimenti i == WINDOW / 2
-                    System.out.println("Local serve e Client non perfettamente allineati \n mando a server remoto il nuovo counter corretto");
-                    //... devono mandare i al server remoto
-                }
-                return true;     //trovato valore nella finestra che coincide
-            }
+                return set;     //trovato valore nella finestra che coincide
         }
-        /*AGGIUNGERE CHECK SU QUALE VALORE COINCIDE DELLA FINESTRA
-        • Se rientra nella finestra, login successfull con ri-allineamento del counter del database
-        • Se non rientra nella finestra, login unsuccessfull con ri-allineamento del counter del database
-        */
-        /*
-        for (int i = 0; i < WINDOW + 1; i++) {
-            System.out.println("HOTPWindow [" + i + "] = " + HOTPWindow[i] + "");
-        }*/
-        return false;
+        return -1;
     }
 
     public static String HOTPGen(long dongle_counter, String dongle_key) {
