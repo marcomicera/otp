@@ -134,7 +134,6 @@ public class OTPremoteServer extends Application {
     
     public void insertUser(String username, String password, byte[] key, long counter, boolean lw) {
         String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?);";
-        byte[] counterBytes = encr.longToBytes(counter); 
 
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
@@ -159,27 +158,39 @@ public class OTPremoteServer extends Application {
     }
     
     public void updateCounter(String username, long new_value) {
-        String query = "INSERT INTO portafoglio VALUES " + new String(new char[voci.size()]).replace("\0", "(?, ?, ?, ?),"); // 44)
-        query = query.substring(0, query.length() - 1); // 45)
-            
-            try(Connection co = DriverManager.getConnection("jdbc:mysql://localhost:3306/portafoglio?user=root&password="); // 05)
-                PreparedStatement ps = co.prepareStatement(query); // 06)
-            ) {
-                int i = 1; // 46)
-                for(Voce v: voci) {
-                    ps.setInt(i++, v.getId()); // 09)
-                    ps.setString(i++, v.getNome()); // 09)
-                    ps.setDouble(i++, v.getImporto()); // 09)
-                    ps.setDate(i++, v.getData()); // 09)
-                }
-                ps.executeUpdate(); // 47)
-            } catch(SQLException e) {
-                System.err.println(e.getMessage());
-            }
+        String query = "UPDATE users SET dongle_counter = ? WHERE username = ?;";
+
+        try(// SSL not used in the bank
+            // trovare un modo per far connettere solo questa applicazione al database
+            Connection co = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
+            );
+            PreparedStatement ps = co.prepareStatement(query);
+        ) {
+            ps.setString(2, username);
+            ps.setString(1, new String(encr.encrypt(new_value)));
+            ps.executeUpdate();
+        } catch(SQLException | GeneralSecurityException e) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
     
     public void updateLargeWindow(String username, boolean new_value) {
-        
+        String query = "UPDATE users SET large_window_on = ? WHERE username = ?;";
+
+        try(// SSL not used in the bank
+            // trovare un modo per far connettere solo questa applicazione al database
+            Connection co = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
+            );
+            PreparedStatement ps = co.prepareStatement(query);
+        ) {
+            ps.setString(2, username);
+            ps.setString(1, new String(encr.encrypt(new_value)));
+            ps.executeUpdate();
+        } catch(SQLException | GeneralSecurityException e) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
     
     // Test
@@ -239,14 +250,15 @@ public class OTPremoteServer extends Application {
         insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false);
     }
     
-    /*private void printCertificate(SSLSession session, Certificate[] certificate) {
-        for (int i = 0; i < certificate.length; i++)
+    // Test
+    private void printCertificate(SSLSession session, Certificate[] certificate) {
+        /*for (int i = 0; i < certificate.length; i++)
             System.out.println(((X509Certificate)certificate[i]).getSubjectDN());
         System.out.println("Peer host is " + session.getPeerHost());
         System.out.println("Cipher is " + session.getCipherSuite());
         System.out.println("Protocol is " + session.getProtocol());
         System.out.println("ID is " + new BigInteger(session.getId()));
         System.out.println("Session created in " + session.getCreationTime());
-        System.out.println("Session accessed in " + session.getLastAccessedTime());
-    }*/
+        System.out.println("Session accessed in " + session.getLastAccessedTime());*/
+    }
 }
