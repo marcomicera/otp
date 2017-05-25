@@ -68,10 +68,57 @@ public class OTPremoteServer extends Application {
                             UserInfos user = (UserInfos)lsOis.readObject();
                             System.out.println("Received: " + user);
                             
-                            // Sends reply
-                            // System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
-                            // System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
-                            lsOos.writeObject(loginCheck(user.getUsername(), user.getPassword()));
+                            // Sends CounterResponse containing dongle_key, dongle_counter and large_window mode
+                                // System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
+                                // System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
+                            CounterResponse reply = loginCheck(
+                                user.getUsername(),
+                                user.getPassword()
+                            );
+                            lsOos.writeObject(reply);
+                            
+                            // Reads localServer response
+                            CounterResponse response = (CounterResponse)lsOis.readObject();
+                            
+                            // Login unsuccessful
+                            if(response.getDongleCounter() == null || response.getDongleKey() == null) {
+                                // Thread terminates
+                            }
+                            else {
+                                // User's OTP is in large window
+                                if(response.getLargeWindowOn()) {
+                                    // User's OTP is different from the previous one
+                                    if(response.getDongleCounter() != null) {
+                                        updateCounter(
+                                            user.getUsername(),
+                                            response.getDongleCounter()
+                                        );
+                                    }
+                                    
+                                    // Deactivating large windows for the user
+                                    updateLargeWindow(
+                                        user.getUsername(),
+                                        false,
+                                        null
+                                    );
+                                }
+                                // User's OTP is not in large window
+                                else {
+                                    if(response.getDongleCounter() != null) {
+                                        updateCounter(
+                                            user.getUsername(),
+                                            response.getDongleCounter()
+                                        );
+                                    }
+                                    else if(response.getLargeWindowOn()) {
+                                        updateLargeWindow(
+                                            user.getUsername(),
+                                            true,
+                                            response.getLargeWindowOtp()
+                                        );
+                                    }
+                                }
+                            }
                         } catch(SocketException se) {
                             if(se.getLocalizedMessage().compareTo("Connection reset") == 0)
                                 System.out.println("Local server disconnected");
@@ -163,7 +210,7 @@ public class OTPremoteServer extends Application {
         }
     }
     
-    public void updateCounter(String username, long new_value) {
+    public void updateCounter(String username, long new_counter_value) {
         String query = "UPDATE users SET dongle_counter = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
@@ -174,14 +221,14 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             ps.setString(2, username);
-            ps.setString(1, new String(encr.encrypt(new_value)));
+            ps.setString(1, new String(encr.encrypt(new_counter_value)));
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
-    public void updateLargeWindow(String username, boolean new_value, String lw_otp) {
+    public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) {
         String query =
             "UPDATE users SET large_window_on = ? " + 
             ((new_value) ? ", large_window_otp = ? " : "") +
@@ -197,7 +244,7 @@ public class OTPremoteServer extends Application {
         ) {
             int i = 1;
             ps.setString(i++, new String(encr.encrypt(new_value)));
-            if(new_value)
+            if(new_lw_value)
                 ps.setString(i++, new String(encr.encrypt(lw_otp)));
             else
                 ps.setNull(i++, Types.VARCHAR);
