@@ -73,6 +73,7 @@ public class OTPlocalServer extends Application {
 
                             // Username or password incorrect
                             if(!validCounterResponse(response)) {
+                                // Login unsuccessful
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
