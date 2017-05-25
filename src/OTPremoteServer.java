@@ -234,7 +234,7 @@ public class OTPremoteServer extends Application {
     public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) {
         String query =
             "UPDATE users SET large_window_on = ? " + 
-            ((new_value) ? ", large_window_otp = ? " : "") +
+            ((new_lw_value) ? ", large_window_otp = ? " : "") +
             "WHERE username = ?;"
         ;
 
@@ -246,7 +246,7 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             int i = 1;
-            ps.setString(i++, new String(encr.encrypt(new_value)));
+            ps.setString(i++, new String(encr.encrypt(new_lw_value)));
             if(new_lw_value)
                 ps.setString(i++, new String(encr.encrypt(lw_otp)));
             else
