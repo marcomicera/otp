@@ -55,7 +55,7 @@ public class OTPremoteServer extends Application {
         //inserts();
         //updateLargeWindow("stefanbotti", true, "158473");
         
-        /*try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
+        try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
             while(true) {
                 SSLSocket lsSocket = (SSLSocket)lsServerSocket.accept();
@@ -88,7 +88,7 @@ public class OTPremoteServer extends Application {
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
-        }*/
+        }
     }
     
     public CounterResponse loginCheck(String username, String password) {
