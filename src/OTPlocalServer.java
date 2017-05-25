@@ -77,36 +77,37 @@ public class OTPlocalServer extends Application {
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
                             else {
-                                if(!response.getLargeWindowOn()){
-                                     if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false)) {
-                                         //MANDO AGGIORNAMETO AL REMOTE SERVER CON COUNTER RICEVUTO + 1
-                                         cOos.writeInt(1);                                                                    
-                                         System.out.println(user.getUsername() + " has logged successfully.");
-                                     }
-                                     else{
-                                          if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
-                                              //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW + CODICE OTP
-                                          }
-                                           cOos.writeInt(0);
-                                           System.out.println(user.getUsername() + " has not logged successfully.");
-                                     }
+                                if(!response.getLargeWindowOn()) {
+                                    if(HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false)) {
+                                        //MANDO AGGIORNAMETO AL REMOTE SERVER CON COUNTER RICEVUTO + 1
+                                        cOos.writeInt(1);                                                                    
+                                        System.out.println(user.getUsername() + " has logged successfully.");
+                                    }
+                                    else
+                                    {
+                                        if(HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
+                                            //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW + CODICE OTP
+                                        }
+                                        cOos.writeInt(0);
+                                        System.out.println(user.getUsername() + " has not logged successfully.");
+                                    }
                                 } 
                                 else{
-                                     if (HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
-                                         if(response.getLargeWindowOtp().compareTo(user.getOtp()) != 0 ){
-                                             //UPDATE USER COUNTER DB + DEATTIVO LA FINESTRA LARGA
-                                             cOos.writeInt(1);                                                                    
-                                             System.out.println(user.getUsername() + " has logged successfully.");
-                                         }
-                                         else{
-                                             //DEATTIVO FINESTRA LARGA
-                                             cOos.writeInt(0);
-                                             System.out.println(user.getUsername() + " has not logged successfully.");
-                                    
-                                         }
-                                     }
+                                    if(
+                                        HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)
+                                        &&
+                                        response.getLargeWindowOtp().compareTo(user.getOtp()) != 0
+                                    ) {
+                                        //UPDATE USER COUNTER DB + DEATTIVO LA FINESTRA LARGA
+                                        cOos.writeInt(1);                                                                    
+                                        System.out.println(user.getUsername() + " has logged successfully.");
+                                    }
+                                    else {
+                                        //DEATTIVO FINESTRA LARGA
+                                        cOos.writeInt(0);
+                                        System.out.println(user.getUsername() + " has not logged successfully.");
+                                    }
                                 }
-
                             }
                             System.out.print("\n");
                         } catch(IOException ex) {
