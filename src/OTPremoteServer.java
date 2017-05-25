@@ -53,6 +53,7 @@ public class OTPremoteServer extends Application {
         encr = new Encryptor();
         
         //inserts();
+        //update("stefanbotti", );
         
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
