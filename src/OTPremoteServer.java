@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -52,8 +53,9 @@ public class OTPremoteServer extends Application {
         encr = new Encryptor();
         
         //inserts();
+        //updateLargeWindow("stefanbotti", true, "158473");
         
-        try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
+        /*try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
             while(true) {
                 SSLSocket lsSocket = (SSLSocket)lsServerSocket.accept();
@@ -86,7 +88,7 @@ public class OTPremoteServer extends Application {
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
-        }
+        }*/
     }
     
     public CounterResponse loginCheck(String username, String password) {
@@ -113,7 +115,8 @@ public class OTPremoteServer extends Application {
                 return new CounterResponse(
                     encr.bytesToLong(encr.decrypt(rs.getString("dongle_counter"))),
                     new String(encr.decrypt(rs.getString("dongle_key"))),
-                    (int)encr.decrypt(rs.getString("large_window_on"))[0] != 0
+                    (int)encr.decrypt(rs.getString("large_window_on"))[0] != 0,
+                    null
                 );
             }
             else {
@@ -132,8 +135,8 @@ public class OTPremoteServer extends Application {
         return new CounterResponse(null, null);
     }
     
-    public void insertUser(String username, String password, byte[] key, long counter, boolean lw) {
-        String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?);";
+    public void insertUser(String username, String password, byte[] key, long counter, boolean lw_on, String lw_otp) {
+        String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?);";
 
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
@@ -149,7 +152,11 @@ public class OTPremoteServer extends Application {
             
             // 0 viene sempre criptato nello stesso modo
             // usare AES in CBC mode con IV
-            ps.setString(5, new String(encr.encrypt(lw)));
+            ps.setString(5, new String(encr.encrypt(lw_on)));
+            if(lw_otp != null)
+                ps.setString(6, new String(encr.encrypt(lw_otp)));
+            else
+                ps.setNull(6, Types.VARCHAR);
 
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException e) {
@@ -175,8 +182,12 @@ public class OTPremoteServer extends Application {
         }
     }
     
-    public void updateLargeWindow(String username, boolean new_value) {
-        String query = "UPDATE users SET large_window_on = ? WHERE username = ?;";
+    public void updateLargeWindow(String username, boolean new_value, String lw_otp) {
+        String query =
+            "UPDATE users SET large_window_on = ? " + 
+            ((new_value) ? ", large_window_otp = ? " : "") +
+            "WHERE username = ?;"
+        ;
 
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
@@ -185,8 +196,14 @@ public class OTPremoteServer extends Application {
             );
             PreparedStatement ps = co.prepareStatement(query);
         ) {
-            ps.setString(2, username);
-            ps.setString(1, new String(encr.encrypt(new_value)));
+            int i = 1;
+            ps.setString(i++, new String(encr.encrypt(new_value)));
+            if(new_value)
+                ps.setString(i++, new String(encr.encrypt(lw_otp)));
+            else
+                ps.setNull(i++, Types.VARCHAR);
+            ps.setString(i, username);
+            
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
@@ -239,15 +256,15 @@ public class OTPremoteServer extends Application {
     
     // Inserts
     private void inserts() {
-        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182, false);
-        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641, false);
-        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121, false);
-        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17, false);
-        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae".getBytes(), 45, false);
-        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611, false);
-        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141, false);
-        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212, false);
-        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false);
+        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182, false, null);
+        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641, false, null);
+        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121, false, null);
+        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17, false, null);
+        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae".getBytes(), 45, false, null);
+        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611, false, null);
+        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141, false, null);
+        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212, false, null);
+        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false, null);
     }
     
     // Test
