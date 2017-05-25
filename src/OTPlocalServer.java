@@ -146,8 +146,10 @@ public class OTPlocalServer extends Application {
                                 }
                                 // User is in large window mode                    
                                 else{
+                                    align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true);
+                                        
                                     // User's OTP in large window and different from the previous one
-                                    if( HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)
+                                    if( align_counter != -1
                                         &&
                                         response.getLargeWindowOtp().compareTo(user.getOtp()) != 0
                                     ) {
