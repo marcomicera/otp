@@ -59,7 +59,7 @@ public class OTPlocalServer extends Application {
                         ) {
                             ObjectInputStream cOis = new ObjectInputStream(cSocket.getInputStream());
                             ObjectInputStream rsOis = new ObjectInputStream(rsSocket.getInputStream());
-                            
+
                             // Receiving user infos
                             UserInfos user = (UserInfos)cOis.readObject();
                             System.out.println("Received: " + user);
