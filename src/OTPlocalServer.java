@@ -70,40 +70,92 @@ public class OTPlocalServer extends Application {
                             // Receiving remote server response
                             CounterResponse response = (CounterResponse)rsOis.readObject();
                             System.out.println(user.getUsername() + "'s large_window_on value: " + response.getLargeWindowOn());
-                            
-                            // Sending response
+
+                            // Username or password incorrect
                             if(!validCounterResponse(response)) {
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
+                            // Username and password correct
                             else {
+                                Long align_counter;
+                                
+                                // User is not in large window mode
                                 if(!response.getLargeWindowOn()) {
-                                    if(HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false)) {
-                                        //MANDO AGGIORNAMETO AL REMOTE SERVER CON COUNTER RICEVUTO + 1
+                                    align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false);
+
+                                    // User's OTP is in narrow window
+                                    if(align_counter != -1) {
+                                        // Updating user's counter value in database
+                                        rsOos.writeObject(
+                                            new CounterResponse(
+                                                align_counter,  // dongle_counter
+                                                null,           // dongle_key
+                                                null,           // large_window_on
+                                                null            // large_window_otp
+                                            )
+                                        );
+                                        
+                                        // Login successful
                                         cOos.writeInt(1);                                                                    
                                         System.out.println(user.getUsername() + " has logged successfully.");
                                     }
-                                    else
-                                    {
-                                        if(HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)) {
-                                            //MANDO AL SERVER COMANDO PER ATTIVARE LARGE WINDOW + CODICE OTP
+                                    // User's OTP is not in narrow window
+                                    else {
+                                        align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true);
+                                        
+                                        // User's OTP is in large window
+                                        if(align_counter != -1) {
+                                            // Activating large window for the user
+                                            rsOos.writeObject(
+                                                new CounterResponse(
+                                                    null,           // dongle_counter
+                                                    null,           // dongle_key
+                                                    true,           // large_window_on
+                                                    align_counter   // large_window_otp
+                                                )
+                                            );
                                         }
+                                        
+                                        // Login usuccessful
                                         cOos.writeInt(0);
                                         System.out.println(user.getUsername() + " has not logged successfully.");
                                     }
-                                } 
+                                }
+                                // User is in large window mode                    
                                 else{
-                                    if(
-                                        HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)
+                                    // User's OTP in large window and different from the previous one
+                                    if( HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true)
                                         &&
                                         response.getLargeWindowOtp().compareTo(user.getOtp()) != 0
                                     ) {
-                                        //UPDATE USER COUNTER DB + DEATTIVO LA FINESTRA LARGA
+                                        // Updating user's counter value in database
+                                        rsOos.writeObject(
+                                            new CounterResponse(
+                                                align_counter,  // dongle_counter
+                                                null,           // dongle_key
+                                                false,          // large_window_on
+                                                null            // large_window_otp
+                                            )
+                                        );
+                                        
+                                        // Login successful
                                         cOos.writeInt(1);                                                                    
                                         System.out.println(user.getUsername() + " has logged successfully.");
                                     }
+                                    // User's OTP not in large window or is equal to the previous one
                                     else {
-                                        //DEATTIVO FINESTRA LARGA
+                                        // Deactivating large window for the user
+                                        rsOos.writeObject(
+                                            new CounterResponse(
+                                                null,           // dongle_counter
+                                                null,           // dongle_key
+                                                false,          // large_window_on
+                                                null            // large_window_otp
+                                            )
+                                        );
+                                        
+                                        // Login unsuccessful
                                         cOos.writeInt(0);
                                         System.out.println(user.getUsername() + " has not logged successfully.");
                                     }
