@@ -190,7 +190,32 @@ public class OTPremoteServer extends Application {
                 String read_window_on = rs.getString("large_window_on");
                 String read_window_otp = rs.getString("large_window_otp");
                 
-                return new CounterResponse(
+                boolean test = rs.wasNull();
+                System.out.println("read_window_otp = " + test);
+                if(test)
+                    return new CounterResponse(
+                        // dongle_counter
+                        encr.bytesToLong(encr.decrypt(read_dongle_counter)),
+                        // dongle_key
+                        new String(encr.decrypt(read_dongle_key)),
+                        // large_window_on
+                        (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
+                        // large_window_otp
+                        null
+                    );
+                else
+                    return new CounterResponse(
+                    // dongle_counter
+                    encr.bytesToLong(encr.decrypt(read_dongle_counter)),
+                    // dongle_key
+                    new String(encr.decrypt(read_dongle_key)),
+                    // large_window_on
+                    (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
+                    // large_window_otp
+                    new String(encr.decrypt(read_window_otp))
+                );
+                
+                /*return new CounterResponse(
                     // dongle_counter
                     encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                     // dongle_key
@@ -202,7 +227,7 @@ public class OTPremoteServer extends Application {
                         new String(encr.decrypt(read_window_otp))
                         :
                         null
-                );
+                );*/
             }
             else {
                 System.out.println(username + ": password do not match.\n" +
