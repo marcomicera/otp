@@ -113,7 +113,7 @@ public class OTPlocalServer extends Application {
                                                     null,           // dongle_counter
                                                     null,           // dongle_key
                                                     true,           // large_window_on
-                                                    align_counter   // large_window_otp
+                                                    user.getOtp()   // large_window_otp
                                                 )
                                             );
                                         }
