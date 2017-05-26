@@ -122,6 +122,15 @@ public class Encryptor {
         return result;
     }
     
+    public static int bytesToInt(byte[] b) {
+        int result = 0;
+        for(int i = 0; i < 4; i++) {
+            result <<= 8;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
+    
     /*public int byteArrayToInt(byte[] array) {
         return ByteBuffer.wrap(array).getInt();
     }

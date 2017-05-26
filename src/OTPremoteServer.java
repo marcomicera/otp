@@ -52,8 +52,8 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
+        //emptyDatabase();
         //inserts();
-        //update("stefanbotti", );
         
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
@@ -88,6 +88,12 @@ public class OTPremoteServer extends Application {
                                 // Reads localServer response in order to understand
                                 // what operations it needs to perform on database
                                 CounterResponse response = (CounterResponse)lsOis.readObject();
+                                System.out.println("localServer response received. Commands:\n" +
+                                    "Dongle counter:\t" + response.getDongleCounter() +
+                                    "\nDongle key:\t" + response.getDongleKey() +
+                                    "\nLarge window mode:\t" + response.getLargeWindowOn() +
+                                    "\nLarge window OTP:\t" + response.getLargeWindowOtp()                                
+                                );
                                 
                                 // User's OTP is in large window
                                 if(reply.getLargeWindowOn()) {
@@ -142,6 +148,8 @@ public class OTPremoteServer extends Application {
     }
     
     public CounterResponse loginCheck(String username, String password) {
+        System.out.println("Starting login check");
+        
         String query = "";
         
         try(// SSL not used in the bank
@@ -158,15 +166,22 @@ public class OTPremoteServer extends Application {
             String decryptedPassword = new String(encr.decrypt(rs.getString("password")));
             
             if(decryptedPassword.compareTo(password) == 0) {
-                System.out.println(username + " logged successfully.\n" +
-                    "His/her password: " + password + "\n"
+                String message_to_prompt =
+                    username + " logged successfully." +
+                    "\nHis/her password:\t" + password +
+                    "\nUser's large window mode:\t" + 
+                    encr.bytesToInt(encr.decrypt(rs.getString("large_window_on"))) +
+                    "\n";    
+                    
+                System.out.println(
+                    message_to_prompt
                 );
                 
                 return new CounterResponse(
                     encr.bytesToLong(encr.decrypt(rs.getString("dongle_counter"))),
                     new String(encr.decrypt(rs.getString("dongle_key"))),
-                    (int)encr.decrypt(rs.getString("large_window_on"))[0] != 0,
-                    null
+                    (encr.bytesToInt(encr.decrypt(rs.getString("large_window_on"))) == 0) ? false : true,
+                    new String(encr.decrypt(rs.getString("large_window_otp")))
                 );
             }
             else {
@@ -176,9 +191,9 @@ public class OTPremoteServer extends Application {
                 );
                 return new CounterResponse(null, null);
             }
-        } catch(SQLException e) {
-            System.err.println(e.getMessage() + "\n");
         } catch(GeneralSecurityException ex) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -233,11 +248,7 @@ public class OTPremoteServer extends Application {
     }
     
     public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) {
-        String query =
-            "UPDATE users SET large_window_on = ? " + 
-            ((new_lw_value) ? ", large_window_otp = ? " : "") +
-            "WHERE username = ?;"
-        ;
+        String query = "UPDATE users SET large_window_on = ?, large_window_otp = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
             // trovare un modo per far connettere solo questa applicazione al database
@@ -315,6 +326,23 @@ public class OTPremoteServer extends Application {
         insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141, false, null);
         insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212, false, null);
         insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false, null);
+    }
+    
+    // Empties database
+    public void emptyDatabase() {
+        String query = "DELETE from users WHERE 1;";
+
+        try(// SSL not used in the bank
+            // trovare un modo per far connettere solo questa applicazione al database
+            Connection co = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
+            );
+            PreparedStatement ps = co.prepareStatement(query);
+        ) {
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
     
     // Test
