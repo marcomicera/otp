@@ -157,14 +157,41 @@ public class HOTPGeneratorServer {
             WINDOW = LARGE_WINDOW;
         else
             WINDOW = NARROW_WINDOW;
-        System.out.println("Valori della finestra: ");
+        
+        // Start of debug printing
+        System.out.println(
+            "Checking OTP " + user_otp + 
+            " using counter " + dongle_counter + 
+            " and key " + dongle_key + ".\n" +
+            "Large window" + ((!lw_on) ? " not" : "") + " used."
+        );
+        System.out.println("Window values: ");
+        for(int i = 0; i < WINDOW + 1; ++i)
+            System.out.print(dongle_counter - (WINDOW / 2) + i + " ");
+        System.out.println("Generated OTP values");
+        // End of debug printing
+        
         String[] HOTPWindow = new String[WINDOW + 1];
-        for (int i = 0; i < WINDOW + 1; i++) {
+        for(int i = 0; i < WINDOW + 1; ++i) {
             long set = (dongle_counter - (WINDOW / 2) + i);
             HOTPWindow[i] = HOTPGen(set, dongle_key);
-            if(HOTPWindow[i].compareTo(user_otp) == 0 )
+            System.out.println("Counter: " + set + "\tOTP: " + HOTPWindow[i]);
+            if(HOTPWindow[i].compareTo(user_otp) == 0) {
+                System.out.println(
+                    "OTP value found in " +
+                    ((lw_on) ? "large" : "narrow") +
+                    " window with index " +
+                    set + "."
+                );
                 return set;     //trovato valore nella finestra che coincide
+            }
         }
+        
+        System.out.println(
+            "OTP value not found in " +
+            ((lw_on) ? "large" : "narrow") +
+            " window.\n"
+        );
         return -1;
     }
 
@@ -172,17 +199,17 @@ public class HOTPGeneratorServer {
         String HOTPString = "";
         try {
             //HOTPGeneratorServer htopgen = new HOTPGeneratorServer(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
-            System.out.println("La dongle_key è: " + dongle_key);
+            //System.out.println("La dongle_key è: " + dongle_key);
             byte[] secret = dongle_key.getBytes();//("14FEA54A019BC73A14FEA54A019BC73A"); //Giustificare perché la dongle key è 16 byte
             long movingFactor;
             movingFactor = dongle_counter;//HOTPGeneratorServer.getCounter();
-            System.out.println("Valore counter: " + movingFactor);
+            //System.out.println("Valore counter: " + movingFactor);
             int codeDigits = 6;
             boolean addChecksum = false;
             int truncationOffset = 0;
             HOTPString = generateOTP(secret, movingFactor, codeDigits, addChecksum, truncationOffset);
-            System.out.println("Codice otp generato: " + HOTPString);
-            System.out.println("Movingfactor counter: " + movingFactor);
+            //System.out.println("Codice otp generato: " + HOTPString);
+            //System.out.println("Movingfactor counter: " + movingFactor);
             updateCounter(movingFactor + 1);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException ex) {
             Logger.getLogger(HOTPGeneratorServer.class.getName()).log(Level.SEVERE, null, ex);

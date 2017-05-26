@@ -69,21 +69,36 @@ public class OTPlocalServer extends Application {
                             
                             // Receiving remote server response
                             CounterResponse response = (CounterResponse)rsOis.readObject();
+                            System.out.println("Response from remoteServer received.");
                             System.out.println(user.getUsername() + "'s large_window_on value: " + response.getLargeWindowOn());
 
                             // Username or password incorrect
                             if(!validCounterResponse(response)) {
+                                System.out.println("Username or password incorrect");
                                 // Login unsuccessful
                                 cOos.writeInt(0);
                                 System.out.println(user.getUsername() + " has not logged successfully.");
                             }
                             // Username and password correct
                             else {
+                                System.out.println("Username and password correct");
                                 Long align_counter;
+                                
+                                System.out.println(
+                                    user.getUsername() + " is " +
+                                    ((!response.getLargeWindowOn()) ? "not " : "") +
+                                    "in large window mode."
+                                );
                                 
                                 // User is not in large window mode
                                 if(!response.getLargeWindowOn()) {
-                                    align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), false);
+                                    // Checking if user's OTP is in narrow window
+                                    align_counter = HOTPGeneratorServer.HOTPCheck(
+                                        user.getOtp(),
+                                        response.getDongleCounter(),
+                                        response.getDongleKey(),
+                                        false
+                                    );
 
                                     // User's OTP is in narrow window
                                     if(align_counter != -1) {
@@ -103,7 +118,13 @@ public class OTPlocalServer extends Application {
                                     }
                                     // User's OTP is not in narrow window
                                     else {
-                                        align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true);
+                                        // Checking if user's OTP is in large window
+                                        align_counter = HOTPGeneratorServer.HOTPCheck(
+                                            user.getOtp(),
+                                            response.getDongleCounter(),
+                                            response.getDongleKey(), 
+                                            true
+                                        );
                                         
                                         // User's OTP is in large window
                                         if(align_counter != -1) {
@@ -137,8 +158,17 @@ public class OTPlocalServer extends Application {
                                 }
                                 // User is in large window mode                    
                                 else {
-                                    align_counter = HOTPGeneratorServer.HOTPCheck(user.getOtp(), response.getDongleCounter(), response.getDongleKey(), true);
-                                        
+                                    // Checking if user's OTP is in large window
+                                    align_counter = HOTPGeneratorServer.HOTPCheck(
+                                        user.getOtp(),
+                                        response.getDongleCounter(),
+                                        response.getDongleKey(),
+                                        true
+                                    );
+                                    
+                                    System.out.println("Primo valore che puo' essere null: " + response.getLargeWindowOtp());
+                                    System.out.println("Secondo valore che puo' essere null: " + user.getOtp());
+                                    
                                     // User's OTP in large window and different from the previous one
                                     if( align_counter != -1
                                         &&
