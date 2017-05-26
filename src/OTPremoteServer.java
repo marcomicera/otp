@@ -52,8 +52,7 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
-        //emptyDatabase();
-        //inserts();
+        emptyDatabase(); inserts();
         
         /*try {
             System.out.println(new String(encr.encrypt("ciao456michela")));
@@ -192,10 +191,14 @@ public class OTPremoteServer extends Application {
                 String read_window_otp = rs.getString("large_window_otp");
                 
                 return new CounterResponse(
+                    // dongle_counter
                     encr.bytesToLong(encr.decrypt(read_dongle_counter)),
+                    // dongle_key
                     new String(encr.decrypt(read_dongle_key)),
+                    // large_window_on
                     (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
-                    (!rs.wasNull()) ?
+                    // large_window_otp
+                        (!rs.wasNull()) ?
                         new String(encr.decrypt(read_window_otp))
                         :
                         null
