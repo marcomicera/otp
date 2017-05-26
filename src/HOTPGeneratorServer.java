@@ -151,7 +151,7 @@ public class HOTPGeneratorServer {
     //****************************************************************************************************************************
 
 
-    public static long HOTPCheck(int user_otp, long dongle_counter, String dongle_key, boolean lw_on) {
+    public static long HOTPCheck(String user_otp, long dongle_counter, String dongle_key, boolean lw_on) {
         int WINDOW;
         if(lw_on)
             WINDOW = LARGE_WINDOW;
@@ -162,7 +162,7 @@ public class HOTPGeneratorServer {
         for (int i = 0; i < WINDOW + 1; i++) {
             long set = (dongle_counter - (WINDOW / 2) + i);
             HOTPWindow[i] = HOTPGen(set, dongle_key);
-            if(Integer.parseInt(HOTPWindow[i]) == user_otp )
+            if(HOTPWindow[i].compareTo(user_otp) == 0 )
                 return set;     //trovato valore nella finestra che coincide
         }
         return -1;
