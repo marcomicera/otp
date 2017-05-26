@@ -14,8 +14,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class HOTPGeneratorServer {
 
-    private final static int WINDOW = 4; //Finestra di valori calcolati dal local server per OTP deve essere pari.
-
+    private final static int NARROW_WINDOW = 4; //Finestra di valori calcolati dal local server per OTP deve essere pari.
+    private final static int LARGE_WINDOW = 25;
     HOTPGeneratorServer() {
     }
 
@@ -151,7 +151,12 @@ public class HOTPGeneratorServer {
     //****************************************************************************************************************************
 
 
-    public static long HOTPCheck(int user_otp, long dongle_counter, String dongle_key) {
+    public static long HOTPCheck(int user_otp, long dongle_counter, String dongle_key, boolean lw_on) {
+        int WINDOW;
+        if(lw_on)
+            WINDOW = LARGE_WINDOW;
+        else
+            WINDOW = NARROW_WINDOW;
         System.out.println("Valori della finestra: ");
         String[] HOTPWindow = new String[WINDOW + 1];
         for (int i = 0; i < WINDOW + 1; i++) {
