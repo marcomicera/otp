@@ -55,6 +55,15 @@ public class OTPremoteServer extends Application {
         //emptyDatabase();
         //inserts();
         
+        /*try {
+            System.out.println(new String(encr.encrypt("ciao456michela")));
+            System.out.println(new String(encr.encrypt("ciao456michela")));
+            System.out.println(new String(encr.encrypt("ciao456michela")));
+            System.out.println(new String(encr.encrypt("ciao456michela")));
+        } catch (GeneralSecurityException ex) {
+            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
             while(true) {
