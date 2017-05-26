@@ -50,9 +50,10 @@ public class LoginUI {
         title = new Label("Home banking login");
         
         usernameLabel = new Label("Username: ");
-        usernameField = new TextField();
+        usernameField = new TextField("stefanbotti");
         passwordLabel = new Label("Password: ");
         passwordField = new PasswordField();
+        passwordField.setText("ciao456michela");
         otpLabel = new Label("OTP: ");
         otpField = new TextField();
         signInButton = new Button("Sign In");
