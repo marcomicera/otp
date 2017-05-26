@@ -177,11 +177,19 @@ public class OTPremoteServer extends Application {
                     message_to_prompt
                 );
                 
+                String read_dongle_counter = rs.getString("dongle_counter");
+                String read_dongle_key = rs.getString("dongle_key");
+                String read_window_on = rs.getString("large_window_on");
+                String read_window_otp = rs.getString("large_window_otp");
+                
                 return new CounterResponse(
-                    encr.bytesToLong(encr.decrypt(rs.getString("dongle_counter"))),
-                    new String(encr.decrypt(rs.getString("dongle_key"))),
-                    (encr.bytesToInt(encr.decrypt(rs.getString("large_window_on"))) == 0) ? false : true,
-                    new String(encr.decrypt(rs.getString("large_window_otp")))
+                    encr.bytesToLong(encr.decrypt(read_dongle_counter)),
+                    new String(encr.decrypt(read_dongle_key)),
+                    (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
+                    (!rs.wasNull()) ?
+                        new String(encr.decrypt(read_window_otp))
+                        :
+                        null
                 );
             }
             else {
