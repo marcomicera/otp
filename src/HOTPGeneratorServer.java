@@ -165,9 +165,6 @@ public class HOTPGeneratorServer {
             " and key " + dongle_key + ".\n" +
             "Large window" + ((!lw_on) ? " not" : "") + " used."
         );
-        System.out.println("Window values: ");
-        for(int i = 0; i < WINDOW + 1; ++i)
-            System.out.print(dongle_counter - (WINDOW / 2) + i + " ");
         System.out.println("Generated OTP values");
         // End of debug printing
         
