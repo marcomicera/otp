@@ -166,9 +166,6 @@ public class OTPlocalServer extends Application {
                                         true
                                     );
                                     
-                                    System.out.println("Primo valore che puo' essere null: " + response.getLargeWindowOtp());
-                                    System.out.println("Secondo valore che puo' essere null: " + user.getOtp());
-                                    
                                     // User's OTP in large window and different from the previous one
                                     if( align_counter != -1
                                         &&
