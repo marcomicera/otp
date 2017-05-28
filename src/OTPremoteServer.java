@@ -2,11 +2,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.GeneralSecurityException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,30 +17,21 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-
-/*  Algorithm: AES
-        • Why it is better than DES
-    Encryption mode: CBC
-        • Why it is better than ECB
-    Padding: PKCS#5
-        • Why                           */
 
 public class OTPremoteServer extends Application {
     // Cipher
     Encryptor encr;
     
     // Its own address
-    private final static int    PORT = 8081;
+    private final static int PORT = 8081;
     
     // Its own certificate
     private final static String CERTIFICATE_NAME = "../../remoteServerCertificate",
                                 CERTIFICATE_PASSWORD = "password";
     
-    // Remote server certificate
-    private final static String LOCAL_SERVER_CERTIFICATE_NAME = "../../localServerCertificate",
-                                LOCAL_SERVER_CERTIFICATE_PASSWORD = "password";
+    // Encoding
+    private final static String ENCODING = "ISO-8859-1";
     
     public void start(Stage stage) {
         // Imports its own certificate
@@ -53,16 +41,7 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
-        emptyDatabase(); try { inserts(); } catch (UnsupportedEncodingException ex) { Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex); }
-        
-        /*try {
-            System.out.println(new String(encr.encrypt("ciao456michela")));
-            System.out.println(new String(encr.encrypt("ciao456michela")));
-            System.out.println(new String(encr.encrypt("ciao456michela")));
-            System.out.println(new String(encr.encrypt("ciao456michela")));
-        } catch (GeneralSecurityException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        //emptyDatabase(); inserts();
         
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
@@ -156,7 +135,7 @@ public class OTPremoteServer extends Application {
         }
     }
     
-    public CounterResponse loginCheck(String username, String password) throws UnsupportedEncodingException {
+    public CounterResponse loginCheck(String username, String password) {
         System.out.println("Starting login check");
         
         String query = "";
@@ -172,7 +151,7 @@ public class OTPremoteServer extends Application {
             ResultSet rs = st.executeQuery(query);
             rs.next();
             
-            String decryptedPassword = new String(encr.decrypt(rs.getString("password")), "ISO-8859-1");
+            String decryptedPassword = new String(encr.decrypt(rs.getString("password")), ENCODING);
             
             if(decryptedPassword.compareTo(password) == 0) {
                 String message_to_prompt =
@@ -198,7 +177,7 @@ public class OTPremoteServer extends Application {
                         // dongle_counter
                         encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                         // dongle_key
-                        new String(encr.decrypt(read_dongle_key), "ISO-8859-1"),
+                        new String(encr.decrypt(read_dongle_key), ENCODING),
                         // large_window_on
                         (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
                         // large_window_otp
@@ -209,26 +188,12 @@ public class OTPremoteServer extends Application {
                     // dongle_counter
                     encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                     // dongle_key
-                    new String(encr.decrypt(read_dongle_key), "ISO-8859-1"),
+                    new String(encr.decrypt(read_dongle_key), ENCODING),
                     // large_window_on
                     (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
                     // large_window_otp
-                    new String(encr.decrypt(read_window_otp), "ISO-8859-1")
+                    new String(encr.decrypt(read_window_otp), ENCODING)
                 );
-                
-                /*return new CounterResponse(
-                    // dongle_counter
-                    encr.bytesToLong(encr.decrypt(read_dongle_counter)),
-                    // dongle_key
-                    new String(encr.decrypt(read_dongle_key)),
-                    // large_window_on
-                    (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
-                    // large_window_otp
-                        (!rs.wasNull()) ?
-                        new String(encr.decrypt(read_window_otp))
-                        :
-                        null
-                );*/
             }
             else {
                 System.out.println(username + ": password do not match.\n" +
@@ -238,19 +203,17 @@ public class OTPremoteServer extends Application {
                 
                 return new CounterResponse(null, null);
             }
-        } catch(GeneralSecurityException ex) {
-            Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+        } catch(GeneralSecurityException | SQLException | UnsupportedEncodingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return new CounterResponse(null, null);
     }
     
-    public void insertUser(String username, String password, String k, long counter, boolean lw_on, String lw_otp) throws UnsupportedEncodingException {
+    public void insertUser(String username, String password, String k, long counter, boolean lw_on, String lw_otp) {
         byte[] key = null;
         try {
-            key = k.getBytes("ISO-8859-1");
+            key = k.getBytes(ENCODING);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -264,25 +227,23 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             ps.setString(1, username);
-            ps.setString(2, new String(encr.encrypt(password), "ISO-8859-1"));
-            ps.setString(3, new String(encr.encrypt(key), "ISO-8859-1"));
-            ps.setString(4, new String(encr.encrypt(counter), "ISO-8859-1"));
+            ps.setString(2, new String(encr.encrypt(password), ENCODING));
+            ps.setString(3, new String(encr.encrypt(key), ENCODING));
+            ps.setString(4, new String(encr.encrypt(counter), ENCODING));
             
-            // 0 viene sempre criptato nello stesso modo
-            // usare AES in CBC mode con IV
-            ps.setString(5, new String(encr.encrypt(lw_on), "ISO-8859-1"));
+            ps.setString(5, new String(encr.encrypt(lw_on), ENCODING));
             if(lw_otp != null)
-                ps.setString(6, new String(encr.encrypt(lw_otp), "ISO-8859-1"));
+                ps.setString(6, new String(encr.encrypt(lw_otp), ENCODING));
             else
                 ps.setNull(6, Types.VARCHAR);
 
             ps.executeUpdate();
-        } catch(SQLException | GeneralSecurityException e) {
+        } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
-    public void updateCounter(String username, long new_counter_value) throws UnsupportedEncodingException {
+    public void updateCounter(String username, long new_counter_value) {
         String query = "UPDATE users SET dongle_counter = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
@@ -293,14 +254,14 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             ps.setString(2, username);
-            ps.setString(1, new String(encr.encrypt(new_counter_value), "ISO-8859-1"));
+            ps.setString(1, new String(encr.encrypt(new_counter_value), ENCODING));
             ps.executeUpdate();
-        } catch(SQLException | GeneralSecurityException e) {
+        } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
-    public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) throws UnsupportedEncodingException {
+    public void updateLargeWindow(String username, boolean new_lw_value, String lw_otp) {
         String query = "UPDATE users SET large_window_on = ?, large_window_otp = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
@@ -311,21 +272,21 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             int i = 1;
-            ps.setString(i++, new String(encr.encrypt(new_lw_value), "ISO-8859-1"));
+            ps.setString(i++, new String(encr.encrypt(new_lw_value), ENCODING));
             if(new_lw_value)
-                ps.setString(i++, new String(encr.encrypt(lw_otp), "ISO-8859-1"));
+                ps.setString(i++, new String(encr.encrypt(lw_otp), ENCODING));
             else
                 ps.setNull(i++, Types.VARCHAR);
             ps.setString(i, username);
             
             ps.executeUpdate();
-        } catch(SQLException | GeneralSecurityException e) {
+        } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
     // Test
-    private void stringEncryptionTest() throws UnsupportedEncodingException {
+    private void stringEncryptionTest() {
         try {
             // String encrypting and decrypting test
             System.out.println("\n *** String encrypting and decrypting test ***");
@@ -335,13 +296,13 @@ public class OTPremoteServer extends Application {
             System.out.println("Plaintext:\t\t" + stringPlainText +
                     "\t\t\tSize:\t" + stringPlainText.length()
             );
-            System.out.println("Ciphertext:\t\t" + new String(stringCipherText, "ISO-8859-1") +
+            System.out.println("Ciphertext:\t\t" + new String(stringCipherText, ENCODING) +
                     "\tSize:\t" + stringCipherText.length
             );
-            System.out.println("Decrypted plaintext:\t" + new String(decryptedStringCipherText, "ISO-8859-1") +
+            System.out.println("Decrypted plaintext:\t" + new String(decryptedStringCipherText, ENCODING) +
                     "\t\t\tSize:\t" + decryptedStringCipherText.length  + "\n"
             );
-        } catch (GeneralSecurityException ex) {
+        } catch(GeneralSecurityException | UnsupportedEncodingException ex) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -369,7 +330,7 @@ public class OTPremoteServer extends Application {
     }
     
     // Inserts
-    private void inserts() throws UnsupportedEncodingException {
+    private void inserts() {
         insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-", 182, false, null);
         insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^", 641, false, null);
         insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£", 121, false, null);
@@ -382,7 +343,7 @@ public class OTPremoteServer extends Application {
     }
     
     // Empties database
-    public void emptyDatabase() {
+    private void emptyDatabase() {
         String query = "DELETE from users WHERE 1;";
 
         try(// SSL not used in the bank
@@ -396,17 +357,5 @@ public class OTPremoteServer extends Application {
         } catch(SQLException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
-    }
-    
-    // Test
-    private void printCertificate(SSLSession session, Certificate[] certificate) {
-        /*for (int i = 0; i < certificate.length; i++)
-            System.out.println(((X509Certificate)certificate[i]).getSubjectDN());
-        System.out.println("Peer host is " + session.getPeerHost());
-        System.out.println("Cipher is " + session.getCipherSuite());
-        System.out.println("Protocol is " + session.getProtocol());
-        System.out.println("ID is " + new BigInteger(session.getId()));
-        System.out.println("Session created in " + session.getCreationTime());
-        System.out.println("Session accessed in " + session.getLastAccessedTime());*/
     }
 }

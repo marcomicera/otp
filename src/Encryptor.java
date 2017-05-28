@@ -19,21 +19,23 @@ import javax.crypto.spec.SecretKeySpec;
 // http://stackoverflow.com/questions/15554296/simple-java-aes-encrypt-decrypt-example
 
 public class Encryptor {
+    private final static String ENCODING = "ISO-8859-1";
     private static final String ALGORITHM = "AES";
     private static final int    KEY_LENGHT = 128; // in bits
+    private static final String KEY_FILE = "../../Key";
     private SecretKey key;
 
     public Encryptor() {
         try {
             if(keyExists()) {
                 System.out.println("Key exists: fetching it...");
-                key = getAESKey();
+                key = getKeyFromFile();
             } else {
                 System.out.println("Key does not exist: creating it...");
                 KeyGenerator keyGen = KeyGenerator.getInstance("AES");
                 keyGen.init(KEY_LENGHT);
                 key = keyGen.generateKey();
-                storeAESKeyDB(key);
+                storeKeyInFile(key);
             }
         } catch(NoSuchAlgorithmException ex) {
             Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
@@ -41,12 +43,12 @@ public class Encryptor {
     }
 
     public static boolean keyExists() {
-        File f = new File("../../Key");
+        File f = new File(KEY_FILE);
         return f.exists();
     }
 
-    public static SecretKeySpec getAESKey() {
-        try(FileInputStream fin = new FileInputStream("../../Key");
+    public static SecretKeySpec getKeyFromFile() {
+        try(FileInputStream fin = new FileInputStream(KEY_FILE);
             ObjectInputStream oin = new ObjectInputStream(fin);
         ) {
             return (SecretKeySpec)oin.readObject();  
@@ -59,8 +61,8 @@ public class Encryptor {
         return null;
     }
 
-    public static void storeAESKeyDB(SecretKey key) {
-        try(FileOutputStream fout = new FileOutputStream("../../Key");
+    public static void storeKeyInFile(SecretKey key) {
+        try(FileOutputStream fout = new FileOutputStream(KEY_FILE);
             ObjectOutputStream oout = new ObjectOutputStream(fout);
         ) {
             oout.writeObject(key);               
@@ -78,8 +80,8 @@ public class Encryptor {
     
     public byte[] encrypt(String plainText) throws GeneralSecurityException  {
         try {
-            return encrypt(plainText.getBytes("ISO-8859-1"));
-        } catch (UnsupportedEncodingException ex) {
+            return encrypt(plainText.getBytes(ENCODING));
+        } catch(UnsupportedEncodingException ex) {
             Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -106,8 +108,8 @@ public class Encryptor {
     
     public byte[] decrypt(String cipherText) throws GeneralSecurityException  {
         try {
-            return decrypt(cipherText.getBytes("ISO-8859-1"));
-        } catch (UnsupportedEncodingException ex) {
+            return decrypt(cipherText.getBytes(ENCODING));
+        } catch(UnsupportedEncodingException ex) {
             Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -141,12 +143,4 @@ public class Encryptor {
         }
         return result;
     }
-    
-    /*public int byteArrayToInt(byte[] array) {
-        return ByteBuffer.wrap(array).getInt();
-    }
-    
-    public long byteArrayToLong(byte[] array) {
-        return ByteBuffer.wrap(array).getLong();
-    }*/
 }
