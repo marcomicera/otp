@@ -191,7 +191,7 @@ public class OTPremoteServer extends Application {
                 String read_window_otp = rs.getString("large_window_otp");
                 
                 boolean test = rs.wasNull();
-                System.out.println("read_window_otp = " + test);
+                System.out.println("Was read_window_otp null? " + test);
                 if(test)
                     return new CounterResponse(
                         // dongle_counter
