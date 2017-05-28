@@ -7,20 +7,25 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 public class OTPUI {
-    private final static int WRAPPER_SPACING = 5;
+    private final static int    WRAPPER_SPACING = 5,
+                                BOTTOM_BOX_SPACING = 5;
 
     private final VBox wrapper;
     private final Label title;
+    private final HBox bottom_box;
     private TextField otpField;
     private final Button otpButton;
 
     public OTPUI() {
         wrapper = new VBox(WRAPPER_SPACING);
         title = new Label("OTP dongle");
+        
+        bottom_box = new HBox(BOTTOM_BOX_SPACING);
         otpField = new TextField();
         otpButton = new Button("Generate OTP");
         otpButton.setOnAction(
@@ -28,10 +33,13 @@ public class OTPUI {
                     otpField.setText("ciao");
                 }
         );
+        
+        bottom_box.getChildren().addAll(otpButton,
+                                        otpField
+        );
 
-        wrapper.getChildren().addAll(title,
-                otpField,
-                otpButton
+        wrapper.getChildren().addAll(   title,
+                                        bottom_box
         );
 
         otpButton.setOnAction(
@@ -104,6 +112,8 @@ public class OTPUI {
 
     private void setStyle() {
         title.setFont(Font.font("Arial", 40));
+        otpField.setEditable(false);
+        otpField.setFont(Font.font("Dialog", 15));
     }
 
     public VBox getWrapper() {

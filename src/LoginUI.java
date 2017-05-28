@@ -27,7 +27,7 @@ public class LoginUI {
     
     // Style
     private final static int    WRAPPER_SPACING = 5,
-                                BOTTOM_BOX_SPACING = 200,
+                                BOTTOM_BOX_SPACING = 267,
                                 USERNAME_MINIMUM_LENGTH = 1, //8
                                 USERNAME_MAXIMUM_LENGTH = 32,
                                 PASSWORD_MINIMUM_LENGTH = 1, //8
@@ -90,7 +90,6 @@ public class LoginUI {
     private void setStyle() {
         title.setFont(Font.font(FONT, 40));
         dialog.setTextAlignment(TextAlignment.RIGHT);
-        
     }
     
     public void updateDialog(String s, Color c) {
