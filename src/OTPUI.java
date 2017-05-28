@@ -1,8 +1,6 @@
-
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -13,7 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 public class OTPUI {
-
     private final static int WRAPPER_SPACING = 5;
 
     private final VBox wrapper;
@@ -77,6 +74,7 @@ public class OTPUI {
                         Logger.getLogger(OTPUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     otpField.setText(HOTPString);
+                    
                     // HOTP generation function (to be put in a dedicated class)
                     /* RFC 4226 http://www.ietf.org/rfc/rfc4226.txt
                     5.1.  Notation and Symbols
@@ -96,7 +94,7 @@ public class OTPUI {
                             • Return D = Snum mod 10^Digit
                             • D is a number in the range 0...10^{Digit}-1
                 
-                // Practical implementation: https://goo.gl/sANcmD
+                        X) Practical implementation: https://goo.gl/sANcmD
                      */
                 }
         );

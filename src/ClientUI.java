@@ -1,7 +1,7 @@
 import javafx.scene.layout.VBox;
 
 public class ClientUI {
-    private final static int    WRAPPER_SPACING = 40;
+    private final static int WRAPPER_SPACING = 40;
     
     private final VBox wrapper;
     private final LoginUI loginUI;

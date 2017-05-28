@@ -17,6 +17,10 @@ class UserInfos implements Serializable {
     
     @Override
     public String toString() {
-        return "[user: " + username + " | password: " + password + " | otp: " + otp + "]";
+        return
+            "[user: " + username + 
+            " | password: " + password + 
+            " | otp: " + otp + "]"
+        ;
     }
 }
