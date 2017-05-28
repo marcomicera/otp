@@ -41,7 +41,7 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
-        emptyDatabase(); inserts();
+        //emptyDatabase(); inserts();
         
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
@@ -179,7 +179,8 @@ public class OTPremoteServer extends Application {
                         // dongle_counter
                         encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                         // dongle_key
-                        new String(encr.decrypt(read_dongle_key), ENCODING), // large_window_on
+                        new String(encr.decrypt(read_dongle_key), ENCODING),
+                        // large_window_on
                         ("1".equals(read_window_on)),
                         // large_window_otp
                         null
@@ -189,7 +190,8 @@ public class OTPremoteServer extends Application {
                     // dongle_counter
                     encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                     // dongle_key
-                    new String(encr.decrypt(read_dongle_key), ENCODING), // large_window_on
+                    new String(encr.decrypt(read_dongle_key), ENCODING),
+                    // large_window_on
                     ("1".equals(read_window_on)),
                     // large_window_otp
                     new String(encr.decrypt(read_window_otp), ENCODING)
