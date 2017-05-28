@@ -1,11 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.util.logging.Level;
@@ -14,7 +9,7 @@ import javax.net.ssl.*;
 
 public class OTPlocalServer extends Application {
     // Its own address
-    private final static int    PORT = 8080;
+    private final static int PORT = 8080;
     
     // Its own certificate
     private final static String CERTIFICATE_NAME = "../../localServerCertificate",
@@ -222,17 +217,4 @@ public class OTPlocalServer extends Application {
     private boolean validCounterResponse(CounterResponse response) {
         return response.getDongleCounter() != null && response.getDongleKey() != null;
     }
-
-    
-        
-    /*private void printCertificate(SSLSession session, Certificate[] certificate) {
-        for (int i = 0; i < certificate.length; i++)
-            System.out.println(((X509Certificate)certificate[i]).getSubjectDN());
-        System.out.println("Peer host is " + session.getPeerHost());
-        System.out.println("Cipher is " + session.getCipherSuite());
-        System.out.println("Protocol is " + session.getProtocol());
-        System.out.println("ID is " + new BigInteger(session.getId()));
-        System.out.println("Session created in " + session.getCreationTime());
-        System.out.println("Session accessed in " + session.getLastAccessedTime());
-    }*/
 }
