@@ -10,41 +10,8 @@ public class HOTPGeneratorServer {
 
     private final static int NARROW_WINDOW = 4; //Finestra di valori calcolati dal local server per OTP deve essere pari.
     private final static int LARGE_WINDOW = 25;
+    
     HOTPGeneratorServer() {
-    }
-
-    // These are used to calculate the check-sum digits.
-    //                                0  1  2  3  4  5  6  7  8  9
-    private static final int[] doubleDigits
-            = {0, 2, 4, 6, 8, 1, 3, 5, 7, 9};
-
-    /**
-     * Calculates the checksum using the credit card algorithm. This algorithm
-     * has the advantage that it detects any single mistyped digit and any
-     * single transposition of adjacent digits.
-     *
-     * @param num the number to calculate the checksum for
-     * @param digits number of significant places in the number
-     *
-     * @return the checksum of num
-     */
-    public static int calcChecksum(long num, int digits) {
-        boolean doubleDigit = true;
-        int total = 0;
-        while (0 < digits--) {
-            int digit = (int) (num % 10);
-            num /= 10;
-            if (doubleDigit) {
-                digit = doubleDigits[digit];
-            }
-            total += digit;
-            doubleDigit = !doubleDigit;
-        }
-        int result = total % 10;
-        if (result > 0) {
-            result = 10 - result;
-        }
-        return result;
     }
 
     /**
@@ -63,7 +30,6 @@ public class HOTPGeneratorServer {
      */
     public static byte[] hmac_sha1(byte[] keyBytes, byte[] text)
             throws NoSuchAlgorithmException, InvalidKeyException {
-        //        try {
         Mac hmacSha1;
         try {
             hmacSha1 = Mac.getInstance("HmacSHA1");
@@ -74,15 +40,19 @@ public class HOTPGeneratorServer {
                 = new SecretKeySpec(keyBytes, "RAW");
         hmacSha1.init(macKey);
         return hmacSha1.doFinal(text);
-        //        } catch (GeneralSecurityException gse) {
-        //            throw new UndeclaredThrowableException(gse);
-        //        }
     }
 
     private static final int[] DIGITS_POWER
             // 0 1  2   3    4     5      6       7        8
             = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
 
+    /*https://tools.ietf.org/html/rfc4226#page-27*/
+    /*
+    * OneTimePasswordAlgorithm.java
+    * OATH Initiative,
+    * HOTP one-time password algorithm
+    *
+    */
     /**
      * This method generates an OTP value for the given set of parameters.
      *
@@ -91,8 +61,6 @@ public class HOTPGeneratorServer {
      * per use basis.
      * @param codeDigits the number of digits in the OTP, not including the
      * checksum, if any.
-     * @param addChecksum a flag that indicates if a checksum digit should be
-     * appended to the OTP.
      * @param truncationOffset the offset into the MAC result to begin
      * truncation. If this value is out of the range of 0 ... 15, then dynamic
      * truncation will be used. Dynamic truncation is when the last 4 bits of
@@ -105,11 +73,12 @@ public class HOTPGeneratorServer {
      * @return A numeric String in base 10 that includes {@link codeDigits}
      * digits plus the optional checksum digit if requested.
      */
-    static public String generateOTP(byte[] secret, long movingFactor, int codeDigits, boolean addChecksum, int truncationOffset)
+
+    static public String generateOTP(byte[] secret, long movingFactor, int codeDigits, int truncationOffset)
             throws NoSuchAlgorithmException, InvalidKeyException {
         // put movingFactor value into text byte array
         String result = null;
-        int digits = addChecksum ? (codeDigits + 1) : codeDigits;
+        int digits = codeDigits;
         byte[] text = new byte[8];
         for (int i = text.length - 1; i >= 0; i--) {
             text[i] = (byte) (movingFactor & 0xff); // movingFactor è il counter
@@ -132,9 +101,7 @@ public class HOTPGeneratorServer {
                 | (hash[offset + 3] & 0xff);
 
         int otp = binary % DIGITS_POWER[codeDigits];
-        if (addChecksum) {
-            otp = (otp * 10) + calcChecksum(otp, codeDigits);
-        }
+        
         result = Integer.toString(otp);
         while (result.length() < digits) {
             result = "0" + result;
@@ -164,14 +131,14 @@ public class HOTPGeneratorServer {
             long set = (dongle_counter - (WINDOW / 2) + i);
             HOTPWindow[i] = HOTPGen(set, dongle_key);
             System.out.println("Counter: " + set + "\tOTP: " + HOTPWindow[i]);
-            if(HOTPWindow[i].compareTo(user_otp) == 0) {
+            if(HOTPWindow[i].compareTo(user_otp) == 0) { //trovato valore nella finestra che coincide
                 System.out.println(
                     "OTP value found in " +
                     ((lw_on) ? "large" : "narrow") +
                     " window with index " +
                     set + "."
                 );
-                return set;     //trovato valore nella finestra che coincide
+                return set;     
             }
         }
         
@@ -186,16 +153,14 @@ public class HOTPGeneratorServer {
     public static String HOTPGen(long dongle_counter, String dongle_key) {
         String HOTPString = "";
         try {
-            //HOTPGeneratorServer htopgen = new HOTPGeneratorServer(); // A che serve? Non viene mai usato e la classe ha tutti metodi statici
             //System.out.println("La dongle_key è: " + dongle_key);
-            byte[] secret = dongle_key.getBytes();//("14FEA54A019BC73A14FEA54A019BC73A"); //Giustificare perché la dongle key è 16 byte
+            byte[] secret = dongle_key.getBytes();
             long movingFactor;
-            movingFactor = dongle_counter;//HOTPGeneratorServer.getCounter();
+            movingFactor = dongle_counter;
             //System.out.println("Valore counter: " + movingFactor);
             int codeDigits = 6;
-            boolean addChecksum = false;
             int truncationOffset = 0;
-            HOTPString = generateOTP(secret, movingFactor, codeDigits, addChecksum, truncationOffset);
+            HOTPString = generateOTP(secret, movingFactor, codeDigits, truncationOffset);
             //System.out.println("Codice otp generato: " + HOTPString);
             //System.out.println("Movingfactor counter: " + movingFactor);
         } catch(NoSuchAlgorithmException | InvalidKeyException ex) {

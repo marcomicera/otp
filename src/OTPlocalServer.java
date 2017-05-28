@@ -45,7 +45,7 @@ public class OTPlocalServer extends Application {
 
                 Thread clientThread = new Thread() {
                     public void run() {
-                        /**/System.out.println("Thread " + Thread.currentThread().getId());
+                        System.out.println("Thread " + Thread.currentThread().getId());
                         
                         try(// Socket for remoteServer communication
                             SSLSocket rsSocket = (SSLSocket)rsSocketFactory.createSocket(REMOTE_SERVER_ADDRESS, REMOTE_SERVER_PORT);
