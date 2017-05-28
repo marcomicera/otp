@@ -199,9 +199,7 @@ public class OTPlocalServer extends Application {
                                 }
                             }
                             System.out.print("\n");
-                        } catch(IOException ex) {
-                            Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch(ClassNotFoundException ex) {
+                        } catch(IOException | ClassNotFoundException ex) {
                             Logger.getLogger(OTPlocalServer.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
