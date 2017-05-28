@@ -41,7 +41,7 @@ public class OTPremoteServer extends Application {
         SSLServerSocketFactory lsSocketFactory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
         encr = new Encryptor();
         
-        //emptyDatabase(); inserts();
+        emptyDatabase(); inserts();
         
         try(SSLServerSocket lsServerSocket = (SSLServerSocket)lsSocketFactory.createServerSocket(PORT)) {
             System.out.println("Remote server started\n");
@@ -160,7 +160,7 @@ public class OTPremoteServer extends Application {
                     username + " logged successfully." +
                     "\nHis/her password:\t" + password +
                     "\nUser's large window mode:\t" + 
-                    encr.bytesToInt(encr.decrypt(rs.getString("large_window_on")))
+                    (rs.getString("large_window_on"))
                 ;
                     
                 System.out.println(
@@ -179,9 +179,8 @@ public class OTPremoteServer extends Application {
                         // dongle_counter
                         encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                         // dongle_key
-                        new String(encr.decrypt(read_dongle_key), ENCODING),
-                        // large_window_on
-                        (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
+                        new String(encr.decrypt(read_dongle_key), ENCODING), // large_window_on
+                        ("1".equals(read_window_on)),
                         // large_window_otp
                         null
                     );
@@ -190,9 +189,8 @@ public class OTPremoteServer extends Application {
                     // dongle_counter
                     encr.bytesToLong(encr.decrypt(read_dongle_counter)),
                     // dongle_key
-                    new String(encr.decrypt(read_dongle_key), ENCODING),
-                    // large_window_on
-                    (encr.bytesToInt(encr.decrypt(read_window_on)) == 0) ? false : true,
+                    new String(encr.decrypt(read_dongle_key), ENCODING), // large_window_on
+                    ("1".equals(read_window_on)),
                     // large_window_otp
                     new String(encr.decrypt(read_window_otp), ENCODING)
                 );
@@ -231,9 +229,8 @@ public class OTPremoteServer extends Application {
             ps.setString(1, username);
             ps.setString(2, new String(encr.encrypt(password), ENCODING));
             ps.setString(3, new String(encr.encrypt(key), ENCODING));
-            ps.setString(4, new String(encr.encrypt(counter), ENCODING));
-            
-            ps.setString(5, new String(encr.encrypt(lw_on), ENCODING));
+            ps.setString(4, new String(encr.encrypt(counter), ENCODING));            
+            ps.setString(5, (lw_on) ? "1" : "0");
             if(lw_otp != null)
                 ps.setString(6, new String(encr.encrypt(lw_otp), ENCODING));
             else
@@ -274,7 +271,7 @@ public class OTPremoteServer extends Application {
             PreparedStatement ps = co.prepareStatement(query);
         ) {
             int i = 1;
-            ps.setString(i++, new String(encr.encrypt(new_lw_value), ENCODING));
+            ps.setString(i++, (new_lw_value) ? "1" : "0");
             if(new_lw_value)
                 ps.setString(i++, new String(encr.encrypt(lw_otp), ENCODING));
             else
