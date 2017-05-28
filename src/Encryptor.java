@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
@@ -76,7 +77,12 @@ public class Encryptor {
     }
     
     public byte[] encrypt(String plainText) throws GeneralSecurityException  {
-        return encrypt(plainText.getBytes());
+        try {
+            return encrypt(plainText.getBytes("ISO-8859-1"));
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     public byte[] encrypt(int plainText) throws GeneralSecurityException  {
@@ -99,7 +105,12 @@ public class Encryptor {
     }
     
     public byte[] decrypt(String cipherText) throws GeneralSecurityException  {
-        return decrypt(cipherText.getBytes());
+        try {
+            return decrypt(cipherText.getBytes("ISO-8859-1"));
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
     
     // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
