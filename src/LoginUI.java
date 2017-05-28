@@ -7,8 +7,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -23,6 +26,7 @@ public class LoginUI {
     
     // Style
     private final static int    WRAPPER_SPACING = 5,
+                                BOTTOM_BOX_SPACING = 15,
                                 USERNAME_MINIMUM_LENGTH = 1, //8
                                 USERNAME_MAXIMUM_LENGTH = 32,
                                 PASSWORD_MINIMUM_LENGTH = 1, //8
@@ -39,13 +43,13 @@ public class LoginUI {
     private PasswordField passwordField;
     private final Label otpLabel;
     private TextField otpField;
+    private final HBox bottom_box;
+    private Text dialog;
     private Button signInButton;
     
     public LoginUI(OTPUI otpUI) {
         wrapper = new VBox(WRAPPER_SPACING);
-        
         title = new Label("Home banking login");
-        
         usernameLabel = new Label("Username: ");
         usernameField = new TextField("stefanbotti");
         passwordLabel = new Label("Password: ");
@@ -53,7 +57,14 @@ public class LoginUI {
         passwordField.setText("ciao456michela");
         otpLabel = new Label("OTP: ");
         otpField = new TextField();
+            
+        bottom_box = new HBox(BOTTOM_BOX_SPACING);
         signInButton = new Button("Sign In");
+        dialog = new Text("prova");
+        
+        bottom_box.getChildren().addAll(signInButton,
+                                        dialog
+        );
         
         wrapper.getChildren().addAll(   title,
                                         usernameLabel,
@@ -62,7 +73,7 @@ public class LoginUI {
                                         passwordField,
                                         otpLabel,
                                         otpField,
-                                        signInButton
+                                        bottom_box
         );
         
         signInButton.setOnAction(
@@ -79,15 +90,24 @@ public class LoginUI {
         title.setFont(Font.font(FONT, 40));
     }
     
+    public void updateDialog(String s, Color c) {
+        dialog.setText(s);
+        dialog.setFill(c);
+    }
+    
     private boolean validInputs() {
         // Regexp by: https://goo.gl/QPOQVR
         return  Pattern.matches(
-                    "^(?=.{" + USERNAME_MINIMUM_LENGTH + "," + USERNAME_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
+                    "^(?=.{" + USERNAME_MINIMUM_LENGTH + 
+                        "," + USERNAME_MAXIMUM_LENGTH + 
+                        "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$",
                     usernameField.getText()
                 )
                 &&
                 Pattern.matches(
-                    "^(?=.{" + PASSWORD_MINIMUM_LENGTH + "," + PASSWORD_MAXIMUM_LENGTH + "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", 
+                    "^(?=.{" + PASSWORD_MINIMUM_LENGTH + 
+                        "," + PASSWORD_MAXIMUM_LENGTH + 
+                        "}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$", 
                     passwordField.getText()
                 )
                 &&
@@ -114,14 +134,14 @@ public class LoginUI {
                 otpField.getText()
             );
             lsOos.writeObject(infos);
-            System.out.println("\"" + infos + "\" sent.");
+            //System.out.println("\"" + infos + "\" sent.");
 
             // Receives a reply
             int reply = lsOis.readInt();
             if(reply == 1)
-                System.out.println("Logged in successfully.\n");
+                updateDialog("Logged in successfully", Color.GREEN);
             else
-                System.out.println("Login error: please try again.\n");
+                updateDialog("Login error: please try again", Color.RED);
         } catch(IOException e) {
             e.printStackTrace(); 
         }
