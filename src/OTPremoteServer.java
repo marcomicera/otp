@@ -245,7 +245,8 @@ public class OTPremoteServer extends Application {
         return new CounterResponse(null, null);
     }
     
-    public void insertUser(String username, String password, byte[] key, long counter, boolean lw_on, String lw_otp) {
+    public void insertUser(String username, String password, String k, long counter, boolean lw_on, String lw_otp) {
+        byte[] key = k.getBytes();
         String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?);";
 
         try(// SSL not used in the bank
@@ -362,15 +363,15 @@ public class OTPremoteServer extends Application {
     
     // Inserts
     private void inserts() {
-        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-".getBytes(), 182, false, null);
-        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^".getBytes(), 641, false, null);
-        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£".getBytes(), 121, false, null);
-        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG".getBytes(), 17, false, null);
-        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae".getBytes(), 45, false, null);
-        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4".getBytes(), 611, false, null);
-        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF".getBytes(), 141, false, null);
-        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#".getBytes(), 212, false, null);
-        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3".getBytes(), 108, false, null);
+        insertUser("giovanni283", "gvn28__2", "@14klL_.,4ifk?ç-", 182, false, null);
+        insertUser("giovanni.scalzi", "mkde1227.14", "@rk302l.;fXk@è'^", 641, false, null);
+        insertUser("giorgio_mariani_71", "ggg1513285", "@.1_ek'30^d-*eò£", 121, false, null);
+        insertUser("milianti16", "settembre1999gkv", "5ràd_qò1305^'eG", 17, false, null);
+        insertUser("ciccio_tognoli", "palegrete12", "-;3dlrLa.èe*[àae", 45, false, null);
+        insertUser("sandr0231", "loppdk3", "2-l£edL+aks;.ck4", 611, false, null);
+        insertUser("stefanbotti", "ciao456michela", "L#w3aWò8]ì?ì1kdF", 141, false, null);
+        insertUser("claudia-de-santis", "giorgiatiamo46", ".3;4102)$2kEros#", 212, false, null);
+        insertUser("bortanzi.filippo", "filip_bici12", "w.1Wlt1-éàçòg4a3", 108, false, null);
     }
     
     // Empties database
