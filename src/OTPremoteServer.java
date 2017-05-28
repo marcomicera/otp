@@ -57,10 +57,12 @@ public class OTPremoteServer extends Application {
                             UserInfos user = (UserInfos)lsOis.readObject();
                             System.out.println("Received: " + user);
                             
-                            // Sends CounterResponse containing dongle_key, dongle_counter and large_window mode
-                            // If dongle_key and dongle_counter are null, login was not successful
-                                // System.setProperty("javax.net.ssl.trustStore", LOCAL_SERVER_CERTIFICATE_NAME);
-                                // System.setProperty("javax.net.ssl.trustStorePassword", LOCAL_SERVER_CERTIFICATE_PASSWORD);
+                            /*  Sends CounterResponse containing:
+                                    - dongle_key
+                                    - dongle_counter
+                                    - large_window mode
+                                If dongle_key and dongle_counter are null, 
+                                login was not successful                    */
                             CounterResponse reply = loginCheck(
                                 user.getUsername(),
                                 user.getPassword()
