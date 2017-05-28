@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -182,18 +181,6 @@ public class HOTPGenerator {
         return result;
     }
 
-    //****************************************************************************************************************************
-    //Source: http://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i + 1), 16));
-        }
-        return data;
-    }
-
     public static long getCounter() throws IOException {
         FileReader fr = new FileReader("../../Counter.txt");
         BufferedReader br = new BufferedReader(fr);
@@ -207,5 +194,5 @@ public class HOTPGenerator {
         try (PrintWriter writeText = new PrintWriter("../../Counter.txt", "UTF-8")) {
             writeText.println(counter);
         }
-    }    //****************************************************************************************************************************
+  }
 }

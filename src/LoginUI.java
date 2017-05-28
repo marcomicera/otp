@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -26,7 +27,7 @@ public class LoginUI {
     
     // Style
     private final static int    WRAPPER_SPACING = 5,
-                                BOTTOM_BOX_SPACING = 15,
+                                BOTTOM_BOX_SPACING = 200,
                                 USERNAME_MINIMUM_LENGTH = 1, //8
                                 USERNAME_MAXIMUM_LENGTH = 32,
                                 PASSWORD_MINIMUM_LENGTH = 1, //8
@@ -60,7 +61,7 @@ public class LoginUI {
             
         bottom_box = new HBox(BOTTOM_BOX_SPACING);
         signInButton = new Button("Sign In");
-        dialog = new Text("prova");
+        dialog = new Text();
         
         bottom_box.getChildren().addAll(signInButton,
                                         dialog
@@ -88,6 +89,8 @@ public class LoginUI {
     
     private void setStyle() {
         title.setFont(Font.font(FONT, 40));
+        dialog.setTextAlignment(TextAlignment.RIGHT);
+        
     }
     
     public void updateDialog(String s, Color c) {
