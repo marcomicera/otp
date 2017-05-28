@@ -25,9 +25,9 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `dongle_key` varchar(255) DEFAULT NULL,
-  `dongle_counter` varchar(255) DEFAULT NULL,
-  `large_window_on` varchar(255) DEFAULT NULL,
+  `dongle_key` varchar(255) NOT NULL,
+  `dongle_counter` varchar(255) NOT NULL,
+  `large_window_on` varchar(255) NOT NULL,
   `large_window_otp` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -39,7 +39,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('bortanzi.filippo','6Zz÷ÂAÇdõÓÏ†b#bÏ','8ôQ˜7<˜Š*‰Ï¹Ú(RÁ—d«\nf¶£É…pc?ô¸Ñ','65èÒãÕ‹I=ßß6	é','i—;+î*\0à}]èÃt]dO',NULL),('ciccio_tognoli','trßíœx›T¸q²½Iç�','ø;“Í+C7Ãk»¦;ÕM\"¾6X€êR3˜PAêY','Õê—„—Ú{v/oá}ç½','i—;+î*\0à}]èÃt]dO',NULL),('claudia-de-santis','™±Û†åü}¨í.=ÜÑß','r¼ª»ß–´9PO¨ÝOBgùI�÷?øÕpÔn9¨åô&','¼’ß¼F9ö»‚Xè†\'‚ô','i—;+î*\0à}]èÃt]dO',NULL),('giorgio_mariani_71','»ŠF |&˜‰\'†¸3ƒÀâ«','F¯ñªÄiüIgUƒöØÒ\nuõ)VJ8‚â€°ÛbÉ§ù','ž](•mwÍu€~š¢Avò','i—;+î*\0à}]èÃt]dO',NULL),('giovanni.scalzi','# aEÄtëºÃ]4ÆäºB','Š9;�çs ³+2»–9¦R[è�”­�`	çïhs@3©�','\\l:F“ê•óAöfÏ1','i—;+î*\0à}]èÃt]dO',NULL),('giovanni283','µÂ‚_i“° 4VJ…4\0','×ñ™w˜ŒÓ¿Á¤.ñˆ÷ª‰—Ÿ·Lê°äR•Å–','§€¤ti03	k�×:zX','i—;+î*\0à}]èÃt]dO',NULL),('milianti16','þæZö¤\'ï{2åêk,NI�÷?øÕpÔn9¨åô&','…ñ\ZÜúHñ)ÈÏñÀXHÜüúYð£ó�)k<n²','†¹GK0Ê!VÕ\\‰îŠö','i—;+î*\0à}]èÃt]dO',NULL),('sandr0231','—(7±àÏ­ÕœÄ¨§Å\Zr','ÁÂwÜ�¤�Vw`$~u°Ë£:üO×éïK^™¬á�Ì×','Í” ý/�ÿaðj.•¾‡','i—;+î*\0à}]èÃt]dO',NULL),('stefanbotti','][e“QL´%MCÿkîG','‘Žkn[ƒÜãÄ]§hîG—;ª3kd0­«ù¸lÏs','ßîÔ\'vÑlQ£ÍI–%pD','i—;+î*\0à}]èÃt]dO',NULL);
+INSERT INTO `users` VALUES ('bortanzi.filippo','6Zz÷ÂAÇdõÓÏb#bÏ','8ôQ7<*Ï¹Ú(RÁd«\nf¶£Épc?ô¸Ñ','65èÒãÕI=ßß6	é','i;+î*\0à}]èÃt]dO',NULL),('ciccio_tognoli','trßíxT¸q²½Iç','ø;Í+C7Ãk»¦;ÕM\"¾6XêR3PAêY','ÕêÚ{v/oá}ç½','i;+î*\0à}]èÃt]dO',NULL),('claudia-de-santis','±Ûåü}¨í.=ÜÑß','r¼ª»ß´9PO¨ÝOBgùI÷?øÕpÔn9¨åô&','¼ß¼F9ö»Xè\'ô','i;+î*\0à}]èÃt]dO',NULL),('giorgio_mariani_71','»F |&\'¸3Àâ«','F¯ñªÄiüIgUöØÒ\nuõ)VJ8â°ÛbÉ§ù','](mwÍu~¢Avò','i;+î*\0à}]èÃt]dO',NULL),('giovanni.scalzi','# aEÄtëºÃ]4ÆäºB','9;çs ³+2»9¦R[è­`	çïhs@3©','\\l:FêóAöfÏ1','i;+î*\0à}]èÃt]dO',NULL),('giovanni283','µÂ_i° 4VJ4\0','×ñwÓ¿Á¤.ñ÷ª·Lê°äRÅ','§¤ti03	k×:zX','i;+î*\0à}]èÃt]dO',NULL),('milianti16','þæZö¤\'ï{2åêk,NI÷?øÕpÔn9¨åô&','ñ\ZÜúHñ)ÈÏñÀXHÜüúYð£ó)k<n²','¹GK0Ê!VÕ\\îö','i;+î*\0à}]èÃt]dO',NULL),('sandr0231','(7±àÏ­ÕÄ¨§Å\Zr','ÁÂwÜ¤Vw`$~u°Ë£:üO×éïK^¬áÌ×','Í ý/ÿaðj.¾','i;+î*\0à}]èÃt]dO',NULL),('stefanbotti','][eQL´%MCÿkîG','kn[ÜãÄ]§hîG;ª3kd0­«ù¸lÏs','3&Úè~cõ(M@n','i;+î*\0à}]èÃt]dO',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -60,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-25 14:54:37
+-- Dump completed on 2017-05-28 20:20:53
