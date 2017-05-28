@@ -100,7 +100,7 @@ public class OTPremoteServer extends Application {
                                     "Dongle counter:\t" + response.getDongleCounter() +
                                     "\nDongle key:\t" + response.getDongleKey() +
                                     "\nLarge window mode:\t" + response.getLargeWindowOn() +
-                                    "\nLarge window OTP:\t" + response.getLargeWindowOtp()                                
+                                    "\nLarge window OTP:\t" + response.getLargeWindowOtp() + "\n"
                                 );
                                 
                                 // User's OTP is in large window
@@ -178,8 +178,8 @@ public class OTPremoteServer extends Application {
                     username + " logged successfully." +
                     "\nHis/her password:\t" + password +
                     "\nUser's large window mode:\t" + 
-                    encr.bytesToInt(encr.decrypt(rs.getString("large_window_on"))) +
-                    "\n";    
+                    encr.bytesToInt(encr.decrypt(rs.getString("large_window_on")))
+                ;
                     
                 System.out.println(
                     message_to_prompt
@@ -234,6 +234,7 @@ public class OTPremoteServer extends Application {
                     "His/her actual password: " + decryptedPassword +
                     "\nGuessed password: " + password + "\n"
                 );
+                
                 return new CounterResponse(null, null);
             }
         } catch(GeneralSecurityException ex) {
