@@ -1,3 +1,30 @@
+/*  The following code has been taken from RFC 4226 available at
+    https://tools.ietf.org/html/rfc4226#page-27                 */
+
+   /* Copyright (C) 2004, OATH.  All rights reserved.
+    *
+    * License to copy and use this software is granted provided that it
+    * is identified as the "OATH HOTP Algorithm" in all material
+    * mentioning or referencing this software or this function.
+    *
+    * License is also granted to make and use derivative works provided
+    * that such works are identified as
+    *  "derived from OATH HOTP algorithm"
+    * in all material mentioning or referencing the derived work.
+    *
+    * OATH (Open AuTHentication) and its members make no
+    * representations concerning either the merchantability of this
+    * software or the suitability of this software for any particular
+    * purpose.
+    *
+    * It is provided "as is" without express or implied warranty
+    * of any kind and OATH AND ITS MEMBERS EXPRESSaLY DISCLAIMS
+    * ANY WARRANTY OR LIABILITY OF ANY KIND relating to this software.
+    *
+    * These notices must be retained in any copies of any part of this
+    * documentation and/or software.
+    */
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,9 +36,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class HOTPGenerator {
-
     HOTPGenerator() {
     }
+
     /**
      * This method uses the JCE to provide the HMAC-SHA-1 algorithm. HMAC
      * computes a Hashed Message Authentication Code and in this case SHA1 is
@@ -95,7 +122,6 @@ public class HOTPGenerator {
         return result;
     }
 
-  //Questa funziona fornisce il contatore del dongle
     public static long getCounter() throws IOException {
         FileReader fr = new FileReader("../../Counter.txt");
         BufferedReader br = new BufferedReader(fr);
@@ -104,10 +130,10 @@ public class HOTPGenerator {
         long result = Long.parseLong(s);
         return result;
     }
-  //Questa funziona aggiorna il contatore del dongle
-  public static void updateCounter(long counter) throws FileNotFoundException, IOException {
+    
+    public static void updateCounter(long counter) throws FileNotFoundException, IOException {
         try (PrintWriter writeText = new PrintWriter("../../Counter.txt", "UTF-8")) {
             writeText.println(counter);
         }
-  }
+    }
 }
