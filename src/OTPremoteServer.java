@@ -140,17 +140,16 @@ public class OTPremoteServer extends Application {
     public CounterResponse loginCheck(String username, String password) {
         System.out.println("Starting login check");
         
-        String query = "";
+        String query = "SELECT * FROM users WHERE username = ?;";
         
         try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
-            Statement st = co.createStatement();
+            PreparedStatement ps = co.prepareStatement(query);
         ) {
-            query = "SELECT * FROM users WHERE username = \"" + username + "\"";
-            ResultSet rs = st.executeQuery(query);
+            ps.setString(1, new String(encr.encrypt(username), ENCODING));
+            ResultSet rs = ps.executeQuery();
             rs.next();
             
             String decryptedPassword = new String(encr.decrypt(rs.getString("password")), ENCODING);
@@ -222,13 +221,12 @@ public class OTPremoteServer extends Application {
         String query = "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?);";
 
         try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
             PreparedStatement ps = co.prepareStatement(query);
         ) {
-            ps.setString(1, username);
+            ps.setString(1, new String(encr.encrypt(username), ENCODING));
             ps.setString(2, new String(encr.encrypt(password), ENCODING));
             ps.setString(3, new String(encr.encrypt(key), ENCODING));
             ps.setString(4, new String(encr.encrypt(counter), ENCODING));            
@@ -248,13 +246,12 @@ public class OTPremoteServer extends Application {
         String query = "UPDATE users SET dongle_counter = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
             PreparedStatement ps = co.prepareStatement(query);
         ) {
-            ps.setString(2, username);
+            ps.setString(2, new String(encr.encrypt(username), ENCODING));
             ps.setString(1, new String(encr.encrypt(new_counter_value), ENCODING));
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
@@ -266,19 +263,17 @@ public class OTPremoteServer extends Application {
         String query = "UPDATE users SET large_window_on = ?, large_window_otp = ? WHERE username = ?;";
 
         try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
             PreparedStatement ps = co.prepareStatement(query);
         ) {
-            int i = 1;
-            ps.setString(i++, (new_lw_value) ? "1" : "0");
+            ps.setString(1, (new_lw_value) ? "1" : "0");
             if(new_lw_value)
-                ps.setString(i++, new String(encr.encrypt(lw_otp), ENCODING));
+                ps.setString(2, new String(encr.encrypt(lw_otp), ENCODING));
             else
-                ps.setNull(i++, Types.VARCHAR);
-            ps.setString(i, username);
+                ps.setNull(2, Types.VARCHAR);
+            ps.setString(3, new String(encr.encrypt(username), ENCODING));
             
             ps.executeUpdate();
         } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
@@ -348,7 +343,6 @@ public class OTPremoteServer extends Application {
         String query = "DELETE from users WHERE 1;";
 
         try(// SSL not used in the bank
-            // trovare un modo per far connettere solo questa applicazione al database
             Connection co = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bank?user=root&password=root&autoReconnect=true&useSSL=false"
             );
