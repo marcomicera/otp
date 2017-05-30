@@ -16,8 +16,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-// http://stackoverflow.com/questions/15554296/simple-java-aes-encrypt-decrypt-example
-
 public class Encryptor {
     private final static String ENCODING = "ISO-8859-1";
     private static final String ALGORITHM = "AES";
@@ -115,7 +113,7 @@ public class Encryptor {
         return null;
     }
     
-    // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+    // Thanks to https://goo.gl/9iGSZl
     public static byte[] longToBytes(long l) {
         byte[] result = new byte[8];
         for(int i = 7; i >= 0; i--) {
@@ -125,7 +123,7 @@ public class Encryptor {
         return result;
     }
     
-    // http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java
+    // Thanks to https://goo.gl/9iGSZl
     public static long bytesToLong(byte[] b) {
         long result = 0;
         for(int i = 0; i < 8; i++) {
@@ -135,6 +133,7 @@ public class Encryptor {
         return result;
     }
     
+    // Thanks to https://goo.gl/9iGSZl
     public static int bytesToInt(byte[] b) {
         int result = 0;
         for(int i = 0; i < 4; i++) {

@@ -9,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,8 +60,8 @@ public class OTPremoteServer extends Application {
                                     - dongle_key
                                     - dongle_counter
                                     - large_window mode
-                                If dongle_key and dongle_counter are null, 
-                                login was not successful                    */
+                                If dongle_key and dongle_counter are
+                                null, login was not successful          */
                             CounterResponse reply = loginCheck(
                                 user.getUsername(),
                                 user.getPassword()
