@@ -69,7 +69,7 @@ public class OTPremoteServer extends Application {
                             lsOos.writeObject(reply);
                             
                             // Login unsuccessful
-                            if(reply.getDongleCounter() == null || reply.getDongleKey() == null) {
+                            if(!validCounterResponse(reply)) {
                                 // Thread terminates
                             }
                             // Login successful
@@ -278,6 +278,10 @@ public class OTPremoteServer extends Application {
         } catch(SQLException | GeneralSecurityException | UnsupportedEncodingException e) {
             Logger.getLogger(OTPremoteServer.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+    
+    private boolean validCounterResponse(CounterResponse response) {
+        return response.getDongleCounter() != null && response.getDongleKey() != null;
     }
     
     // Test
