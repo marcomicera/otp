@@ -10,7 +10,7 @@ public class OTPclient extends Application {
         ui = new ClientUI();
      
         stage.setTitle("One Time Password client interface");
-        stage.setScene(new Scene(ui.getWrapper(), 500, 500));
+        stage.setScene(new Scene(ui.getWrapper(), 500, 400));
         stage.show();
     }
 }
