@@ -34,7 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class HOTPGeneratorServer {
     private final static int NARROW_WINDOW_SIZE = 4;
-    private final static int LARGE_WINDOW_SIZE = 25;
+    private final static int LARGE_WINDOW_SIZE = 30;
     
     HOTPGeneratorServer() {
     }
