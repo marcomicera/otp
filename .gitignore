@@ -1,7 +1,11 @@
 ## Windows desktop.ini files
 **/desktop.ini
 
-/nbproject/private/
+logic/nbproject/private/
+data/build/
+data/dist/
+data/nbproject/private/
+
 
 # Compiled class file
 *.class
