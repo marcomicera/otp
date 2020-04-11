@@ -1,12 +1,6 @@
-## Windows desktop.ini files
-**/desktop.ini
+#### joe made this: http://goel.io/joe
 
-logic/nbproject/private/
-data/build/
-data/dist/
-data/nbproject/private/
-
-
+#### java ####
 # Compiled class file
 *.class
 
@@ -30,3 +24,28 @@ data/nbproject/private/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+
+#### netbeans ####
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+
+#### maven ####
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
